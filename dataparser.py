@@ -34,7 +34,9 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     electionTweets = Data(electionTweets)
+    print(len(electionTweets.getTweets()))
 
     electionTrolls = Data(electionTrolls, True)
-    for tweet in electionTrolls.getTweets():
-        print(tweet)
+
+    #for tweet in electionTrolls.getTweets():
+        #print(tweet)

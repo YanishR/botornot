@@ -9,8 +9,7 @@ from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 class Featurizer():
     # Need to improve object oriented design further in the future
     # initializes object data
-    tokens = []
-    tweet = ""
+
     def __init__(self, tweet):
         self.tokens = tweet.split()
         self.tweet = tweet
@@ -25,14 +24,18 @@ class Featurizer():
              If every character at index 0 for every token is check, hashtags not spaced are not counted as multiple
     """
     def getNumTags(self):
-        hash_count = 0
-        rate_count = 0
-        for char in self.tweet:
-            if char == '#':
-                hash_count += 1
-            if char == '@':
-                rate_count += 1
-        return hash_count, rate_count
+        if not self.hash_count and self.rate_count:
+
+            self.hash_count = 0
+            self.rate_count = 0
+
+            for char in self.tweet:
+                if char == '#':
+                    self.hash_count += 1
+                if char == '@':
+                    self.rate_count += 1
+
+        return self.hash_count, self.rate_count
 
 
     """
@@ -73,7 +76,7 @@ class Featurizer():
     def getNumURL(self):
         #regex citation: GeeksForGeeks
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-        url = re.findall(regex,tweet)
+        url = re.findall(regex,self.tweet)
         return len([x[0] for x in url])
 
 
@@ -169,27 +172,6 @@ class Featurizer():
     def getLetterFrequency(self):
         alphabet=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
         return [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 tweet = " aaa bb cccc dd e y zz"
 F = Featurizer(tweet)
