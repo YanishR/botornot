@@ -131,11 +131,7 @@ class Featurizer():
     """
     def getPOSTaggedDistribution(self):
         tagged = pos_tag(self.tokens)
-        noun_count = 0
-        adj_count = 0
-        adv_count = 0
-        verb_count = 0
-        conj_count = 0
+        noun_count, adj_count, adv_count, verb_count, conj_count = 0, 0, 0, 0, 0
         for tuple in tagged:
             if tuple[1][0] == 'N' and tuple[1][1] == 'N':
                 noun_count += 1
