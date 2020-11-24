@@ -74,11 +74,25 @@ class Featurizer():
 
     """
     getNumTokens(): Returns the number of tokens in a tweet
-    Output: Number of tokens in the particular tweet
+    Output: Integer number of tokens in the particular tweet
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getVocabSize(self):
         return len(set([word.lower() for word in self.tokens]))
+
+
+    """
+    getAvgCapitalizations(): Returns the number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
+    Output: Float number of normalized tokens with a capitalized first character in the particular tweet
+    Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
+    """
+    def getAvgCapitalizations(self):
+        count = 0
+        for token in self.tokens:
+            if token[0].isupper():
+                count += 1
+        return count/self.getNumTokens()
+
 
 
 
@@ -90,4 +104,4 @@ class Featurizer():
 
 tweet = " Hi, my name is Suvinay. This is www.hotmail.com my test tweet #test #final #random www.google.com https://www.facebook.com"
 F = Featurizer(tweet)
-print(F.getVocabSize())
+print(F.getAvgCapitalizations())
