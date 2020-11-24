@@ -1,10 +1,13 @@
 # Featurizer : Has a methods for parsing tweets to generate various stylistic and content based features
-from nltk.tag import pos_tag
 import re
+import numpy as np
+from nltk.tag import pos_tag
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 
 
+
 class Featurizer():
+    # Need to improve object oriented design further in the future
     # initializes object data
     tokens = []
     tweet = ""
@@ -151,8 +154,7 @@ class Featurizer():
     Output: Float length of hashtag words normalized by number of hashtags
     """
     def getAvgHashTagLength(self):
-        tag_count = 0
-        size_count = 0
+        tag_count, size_count = 0, 0
         for token in self.tokens:
             if token[0] == '#':
                 tag_count += 1
@@ -160,6 +162,13 @@ class Featurizer():
         return size_count/tag_count
 
 
+    """
+    getLetterFrequency(): Returns the frequency of each letter (Case insensitive) normalized by the number of tokens in the tweet
+    Output: Array of frequencies for each letter, where each index corresponds to its number in the alphabet
+    """
+    def getLetterFrequency(self):
+        alphabet=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+        return [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
 
 
 
@@ -177,6 +186,11 @@ class Featurizer():
 
 
 
-tweet = " Hi, my name is Suvinay. This is www.hotmail.com my e-mail service. #Hypochondriac #ThisIsAVeryLongHashTag #ABC"
+
+
+
+
+
+tweet = " aaa bb cccc dd e y zz"
 F = Featurizer(tweet)
-print(F.getAvgHashTagLength())
+print(F.getLetterFrequency())
