@@ -146,6 +146,18 @@ class Featurizer():
         return noun_count, adj_count, adv_count, verb_count, conj_count
 
 
+    """
+    getDigitFrequency(): Returns the average size of hashtagged strings in tweet
+    Output: Float length of hashtag words normalized by number of hashtags
+    """
+    def getAvgHashTagLength(self):
+        tag_count = 0
+        size_count = 0
+        for token in self.tokens:
+            if token[0] == '#':
+                tag_count += 1
+                size_count += len(token)
+        return size_count/tag_count
 
 
 
@@ -163,6 +175,8 @@ class Featurizer():
 
 
 
-tweet = " Hi, my name is Suvinay. This is www.hotmail.com my e-mail service."
+
+
+tweet = " Hi, my name is Suvinay. This is www.hotmail.com my e-mail service. #Hypochondriac #ThisIsAVeryLongHashTag #ABC"
 F = Featurizer(tweet)
-print(F.getPOSTaggedDistribution())
+print(F.getAvgHashTagLength())
