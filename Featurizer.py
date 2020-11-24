@@ -3,7 +3,11 @@ from nltk import word_tokenize
 
 class Featurizer():
     # initializes object data
-    def __init__(self):
+    tokens = []
+    tweet = ""
+    def __init__(self, tweet):
+        self.tokens = word_tokenize(tweet)
+        self.tweet = tweet
         pass
 
 
@@ -12,13 +16,17 @@ class Featurizer():
     Input : Tweet object/ string
     Output: Number of hashtag tokens in the particular tweets
     """
-    def getNumHashTags(tweet):
+    def getNumHashTags(self):
         count = 0
-        for token in word_tokenize(tweet):
+        for token in self.tokens:
             if token[0] == '#':
                 count += 1
         return count
 
 
-    tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
-    print(getNumHashTags(tweet))
+
+
+
+tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
+F = Featurizer(tweet)
+print(F.getNumHashTags())
