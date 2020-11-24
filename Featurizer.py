@@ -72,6 +72,15 @@ class Featurizer():
         return len([x[0] for x in url])
 
 
+    """
+    getNumTokens(): Returns the number of tokens in a tweet
+    Output: Number of tokens in the particular tweet
+    Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
+    """
+    def getVocabSize(self):
+        return len(set([word.lower() for word in self.tokens]))
+
+
 
 
 
@@ -81,4 +90,4 @@ class Featurizer():
 
 tweet = " Hi, my name is Suvinay. This is www.hotmail.com my test tweet #test #final #random www.google.com https://www.facebook.com"
 F = Featurizer(tweet)
-print(F.getNumURL())
+print(F.getVocabSize())
