@@ -98,13 +98,25 @@ class Featurizer():
 
     """
     getAvgEmojis(): Returns the average number of  emoji tokens in a tweet normalized by the number of tokens in the tweet
-    Output: Float number of normalized tokens with emojis fir
+    Output: Float number of emojis normalized by tokens in tweet
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getAvgEmojis(self):
         count = 0
         for token in self.tokens:
             if token in UNICODE_EMOJI:
+                count += 1
+        return count/self.getNumTokens()
+
+
+    """
+    getDigitFrequency(): Returns the average number of  digits in a tweet normalized by the number of tokens in the tweet
+    Output: Float number of digits normalized by number of tokens in tweet
+    """
+    def getDigitFrequency(self):
+        count = 0
+        for char in self.tweet:
+            if char.isdigit():
                 count += 1
         return count/self.getNumTokens()
 
@@ -121,6 +133,7 @@ class Featurizer():
 
 
 
-tweet = " Hi, my name is Suvinay. This is www.hotmail.com my test tweet #test #final #random www.google.com https://www.facebook.com"
+
+tweet = " Hi, my name 17 is Suvinay.  23 This is www.hotmail.com my test tweet #test 226 #final #random www.google.com https://www.facebook.com"
 F = Featurizer(tweet)
-print(F.getAvgCapitalizations())
+print(F.getDigitFrequency())
