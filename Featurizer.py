@@ -13,7 +13,6 @@ class Featurizer():
 
     """
     getNumHashTags(tweet): returns the number of hashtags in a tweet
-    Input : Tweet object/ string
     Output: Number of hashtag tokens in the particular tweets
     """
     def getNumHashTags(self):
@@ -23,9 +22,14 @@ class Featurizer():
                 count += 1
         return count
 
-
+    """
+    getNumTokens(tweet): returns the number of tokens in a tweet
+    Output: Number of tokens in the particular tweet
+    """
     def getNumTokens(self):
         return len(self.tokens)
+
+
 
 
 tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
