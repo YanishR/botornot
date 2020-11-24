@@ -1,6 +1,8 @@
 # Featurizer : Has a methods for parsing tweets to generate various stylistic and content based features
 from nltk import word_tokenize
 import re
+from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
+
 
 class Featurizer():
     # initializes object data
@@ -82,7 +84,7 @@ class Featurizer():
 
 
     """
-    getAvgCapitalizations(): Returns the number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
+    getAvgCapitalizations(): Returns the average number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
     Output: Float number of normalized tokens with a capitalized first character in the particular tweet
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
@@ -92,6 +94,23 @@ class Featurizer():
             if token[0].isupper():
                 count += 1
         return count/self.getNumTokens()
+
+
+    """
+    getAvgEmojis(): Returns the average number of  emoji tokens in a tweet normalized by the number of tokens in the tweet
+    Output: Float number of normalized tokens with emojis fir
+    Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
+    """
+    def getAvgEmojis(self):
+        count = 0
+        for token in self.tokens:
+            if token in UNICODE_EMOJI:
+                count += 1
+        return count/self.getNumTokens()
+
+
+
+
 
 
 
