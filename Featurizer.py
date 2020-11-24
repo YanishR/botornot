@@ -14,13 +14,16 @@ class Featurizer():
     """
     getNumHashTags(): returns the number of hashtags in a tweet
     Output: Number of hashtag tokens in the particular tweets
+    Discuss: If every character is checked repeated useless hashtags are counted,
+             If every character at index 0 for every token is check, hashtags not spaced are not counted as multiple
     """
     def getNumHashTags(self):
         count = 0
-        for token in self.tokens:
-            if token[0] == '#':
+        for char in self.tweet:
+            if char == '#':
                 count += 1
         return count
+
 
     """
     getNumTokens(): returns the number of tokens in a tweet
@@ -41,10 +44,23 @@ class Featurizer():
         return count/self.getNumTokens()
 
 
+    """
+    getNumPunct(): returns the number of punctuations used in a tweet normalized by token length
+    Output: float average number of punctuations
+    """
+    def getAvgNumPunct(self):
+        count = 0
+        punct_set = set(['.',',',';',':','?','-','!',"'",'"','[',']','(', ')', '{', '}'])
+        for char in self.tweet:
+            if char in punct_set:
+                count += 1
+        return count/self.getNumTokens()
 
 
 
 
-tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
+
+
+tweet = " Hi, my name is Suvinay. This is my test tweet #test #final #random"
 F = Featurizer(tweet)
-print(F.getAvgWordSize())
+print(F.getAvgNumPunct())
