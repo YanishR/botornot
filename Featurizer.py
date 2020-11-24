@@ -6,7 +6,7 @@ class Featurizer():
     tokens = []
     tweet = ""
     def __init__(self, tweet):
-        self.tokens = word_tokenize(tweet)
+        self.tokens = tweet.split()
         self.tweet = tweet
         pass
 
@@ -24,9 +24,10 @@ class Featurizer():
         return count
 
 
-
+    def getNumTokens(self):
+        return len(self.tokens)
 
 
 tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
 F = Featurizer(tweet)
-print(F.getNumHashTags())
+print(F.getNumTokens())
