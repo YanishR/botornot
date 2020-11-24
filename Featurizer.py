@@ -12,17 +12,21 @@ class Featurizer():
 
 
     """
-    getNumHashTags(): returns the number of hashtags in a tweet
-    Output: Number of hashtag tokens in the particular tweets
+    getNumTags(): returns the number of hashtags and the number of @ mentions
+    Output: Integer number of hashtag tokens in the particular tweet
+            Integer number of @ mentions in the particular tweet
     Discuss: If every character is checked repeated useless hashtags are counted,
              If every character at index 0 for every token is check, hashtags not spaced are not counted as multiple
     """
-    def getNumHashTags(self):
-        count = 0
+    def getNumTags(self):
+        hash_count = 0
+        rate_count = 0
         for char in self.tweet:
             if char == '#':
-                count += 1
-        return count
+                hash_count += 1
+            if char == '@'
+                rate_count += 1
+        return hash_count, rate_count
 
 
     """
@@ -55,6 +59,9 @@ class Featurizer():
             if char in punct_set:
                 count += 1
         return count/self.getNumTokens()
+
+
+
 
 
 
