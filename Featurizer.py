@@ -1,5 +1,6 @@
 # Featurizer : Has a methods for parsing tweets to generate various stylistic and content based features
 from nltk import word_tokenize
+import re
 
 class Featurizer():
     # initializes object data
@@ -12,7 +13,7 @@ class Featurizer():
 
 
     """
-    getNumTags(): returns the number of hashtags and the number of @ mentions
+    getNumTags(): Returns the number of hashtags and the number of @ mentions
     Output: Integer number of hashtag tokens in the particular tweet
             Integer number of @ mentions in the particular tweet
     Discuss: If every character is checked repeated useless hashtags are counted,
@@ -24,13 +25,13 @@ class Featurizer():
         for char in self.tweet:
             if char == '#':
                 hash_count += 1
-            if char == '@'
+            if char == '@':
                 rate_count += 1
         return hash_count, rate_count
 
 
     """
-    getNumTokens(): returns the number of tokens in a tweet
+    getNumTokens(): Returns the number of tokens in a tweet
     Output: Number of tokens in the particular tweet
     """
     def getNumTokens(self):
@@ -38,8 +39,8 @@ class Featurizer():
 
 
     """
-    getAvgWordSize(): returns the average word size (character length) in a tweet
-    Output: average of type float word size (character length) in a tweet
+    getAvgWordSize(): Returns the average word size (character length) in a tweet
+    Output: Average of type float word size (character length) in a tweet (string)
     """
     def getAvgWordSize(self):
         count = 0
@@ -49,8 +50,8 @@ class Featurizer():
 
 
     """
-    getNumPunct(): returns the number of punctuations used in a tweet normalized by token length
-    Output: float average number of punctuations
+    getNumPunct(): Returns the number of punctuations used in a tweet normalized by token length
+    Output: Float average number of punctuations in a string tweet
     """
     def getAvgNumPunct(self):
         count = 0
@@ -60,6 +61,15 @@ class Featurizer():
                 count += 1
         return count/self.getNumTokens()
 
+    """
+    getNumURL(): Returns the number of URLs in a tweet
+    Output: Integer number of URLs in a given string tweet
+    """
+    def getNumURL(self):
+        #regex citation: GeeksForGeeks
+        regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+        url = re.findall(regex,tweet)
+        return len([x[0] for x in url])
 
 
 
@@ -68,6 +78,7 @@ class Featurizer():
 
 
 
-tweet = " Hi, my name is Suvinay. This is my test tweet #test #final #random"
+
+tweet = " Hi, my name is Suvinay. This is www.hotmail.com my test tweet #test #final #random www.google.com https://www.facebook.com"
 F = Featurizer(tweet)
-print(F.getAvgNumPunct())
+print(F.getNumURL())
