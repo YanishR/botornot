@@ -1,5 +1,5 @@
 # Featurizer : Has a methods for parsing tweets to generate various stylistic and content based features
-from nltk import word_tokenize
+from nltk.tag import pos_tag
 import re
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 
@@ -121,6 +121,33 @@ class Featurizer():
         return count/self.getNumTokens()
 
 
+    """
+    getPOSTaggedDistribution(): Returns the number of nouns, adjectives, adverbs, verbs, conjunctions in the tweet after POS tagging
+    Output: noun_count : noun_count: Number of nouns in the tweets
+                         adj_count:  Number of adjectives in the Tweets
+                         adv_count: Number of adverbs in the Tweets
+                         verb_count: Number of verbs in the Tweets
+                         conj_count: Number of conjunctions in the Tweets
+    """
+    def getPOSTaggedDistribution(self):
+        tagged = pos_tag(self.tokens)
+        noun_count = 0
+        adj_count = 0
+        adv_count = 0
+        verb_count = 0
+        conj_count = 0
+        for tuple in tagged:
+            if tuple[1][0] == 'N' and tuple[1][1] == 'N':
+                noun_count += 1
+            elif tuple[1][0] == 'V' and tuple[1][1] == 'B':
+                verb_count += 1
+            elif tuple[1][0] == 'J' and tuple[1][1] == 'J':
+                adj_count += 1
+            elif tuple[1][0] == 'C' and tuple[1][1] == 'C':
+                conj_count += 1
+            elif tuple[1][0] == 'R' and tuple[1][1] == 'B':
+                adv_count += 1
+        return noun_count, adj_count, adv_count, verb_count, conj_count
 
 
 
@@ -134,6 +161,12 @@ class Featurizer():
 
 
 
-tweet = " Hi, my name 17 is Suvinay.  23 This is www.hotmail.com my test tweet #test 226 #final #random www.google.com https://www.facebook.com"
+
+
+
+
+
+
+tweet = " Hi, my name is Suvinay. This is www.hotmail.com my e-mail service."
 F = Featurizer(tweet)
-print(F.getDigitFrequency())
+print(F.getPOSTaggedDistribution())
