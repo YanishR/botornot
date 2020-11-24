@@ -12,7 +12,7 @@ class Featurizer():
 
 
     """
-    getNumHashTags(tweet): returns the number of hashtags in a tweet
+    getNumHashTags(): returns the number of hashtags in a tweet
     Output: Number of hashtag tokens in the particular tweets
     """
     def getNumHashTags(self):
@@ -23,15 +23,28 @@ class Featurizer():
         return count
 
     """
-    getNumTokens(tweet): returns the number of tokens in a tweet
+    getNumTokens(): returns the number of tokens in a tweet
     Output: Number of tokens in the particular tweet
     """
     def getNumTokens(self):
         return len(self.tokens)
 
 
+    """
+    getAvgWordSize(): returns the average word size (character length) in a tweet
+    Output: average of type float word size (character length) in a tweet
+    """
+    def getAvgWordSize(self):
+        count = 0
+        for token in self.tokens:
+            count += len(token)
+        return count/self.getNumTokens()
+
+
+
+
 
 
 tweet = " Hi my name is Suvinay and this is my test tweet #test #final #random"
 F = Featurizer(tweet)
-print(F.getNumTokens())
+print(F.getAvgWordSize())
