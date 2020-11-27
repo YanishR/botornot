@@ -2,8 +2,11 @@
 import re
 import numpy as np
 from nltk.tag import pos_tag
+
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 
+# Get ngram computation method
+from nltk import ngrams
 
 
 class Featurizer():
@@ -13,7 +16,7 @@ class Featurizer():
     def __init__(self, tweet):
         self.tokens = tweet.split()
         self.tweet = tweet
-        pass
+        self.letterFreq = None
 
 
     """
@@ -45,16 +48,18 @@ class Featurizer():
     def getNumTokens(self):
         return len(self.tokens)
 
-
     """
     getAvgWordSize(): Returns the average word size (character length) in a tweet
     Output: Average of type float word size (character length) in a tweet (string)
     """
     def getAvgWordSize(self):
-        count = 0
-        for token in self.tokens:
-            count += len(token)
-        return count/self.getNumTokens()
+        if not self.avgWordSize:
+            count = 0
+            for token in self.tokens:
+                count += len(token)
+            self.avgWordSize = count/self.getNumTokens()
+
+        return self.avgWordSize
 
 
     """
@@ -62,23 +67,28 @@ class Featurizer():
     Output: Float average number of punctuations in a string tweet
     """
     def getAvgNumPunct(self):
-        count = 0
-        punct_set = set(['.',',',';',':','?','-','!',"'",'"','[',']','(', ')', '{', '}'])
-        for char in self.tweet:
-            if char in punct_set:
-                count += 1
-        return count/self.getNumTokens()
+        if not self.avgNumPunct:
+            count = 0
+            punct_set = set(['.',',',';',':','?','-','!',"'",'"','[',']','(', ')', '{', '}'])
+            for char in self.tweet:
+                if char in punct_set:
+                    count += 1
+                
+            self.avgNumPunct = count/self.getNumTokens()
+        return self.avgNumPunct
 
     """
     getNumURL(): Returns the number of URLs in a tweet
     Output: Integer number of URLs in a given string tweet
     """
     def getNumURL(self):
-        #regex citation: GeeksForGeeks
-        regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-        url = re.findall(regex,self.tweet)
-        return len([x[0] for x in url])
+        if not self.numURL:
+            #regex citation: GeeksForGeeks
+            regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+            url = re.findall(regex,self.tweet)
+            self.numURL = len([x[0] for x in url])
 
+        return self.numURL
 
     """
     getNumTokens(): Returns the number of tokens in a tweet
@@ -86,8 +96,9 @@ class Featurizer():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getVocabSize(self):
-        return len(set([word.lower() for word in self.tokens]))
-
+        if not self.vocabSize:
+            self.vocabSize = len(set([word.lower() for word in self.tokens]))
+        return self.vocabSize
 
     """
     getAvgCapitalizations(): Returns the average number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
@@ -95,11 +106,13 @@ class Featurizer():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getAvgCapitalizations(self):
-        count = 0
-        for token in self.tokens:
-            if token[0].isupper():
-                count += 1
-        return count/self.getNumTokens()
+        if not self.avgCaps:
+            count = 0
+            for token in self.tokens:
+                if token[0].isupper():
+                    count += 1
+            self.avgCaps = count/self.getNumTokens()
+        return self.avgCaps
 
 
     """
@@ -108,11 +121,13 @@ class Featurizer():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getAvgEmojis(self):
-        count = 0
-        for token in self.tokens:
-            if token in UNICODE_EMOJI:
-                count += 1
-        return count/self.getNumTokens()
+        if not self.avgEmojis:
+            count = 0
+            for token in self.tokens:
+                if token in UNICODE_EMOJI:
+                    count += 1
+            self.avgEmojis = count/self.getNumTokens()
+        return self.avgEmojis
 
 
     """
@@ -120,11 +135,13 @@ class Featurizer():
     Output: Float number of digits normalized by number of tokens in tweet
     """
     def getDigitFrequency(self):
-        count = 0
-        for char in self.tweet:
-            if char.isdigit():
-                count += 1
-        return count/self.getNumTokens()
+        if not self.digitFrequency:
+            count = 0
+            for char in self.tweet:
+                if char.isdigit():
+                    count += 1
+            self.digitFrequency = count/self.getNumTokens()
+        return self.digitFrequency
 
 
     """
@@ -157,12 +174,14 @@ class Featurizer():
     Output: Float length of hashtag words normalized by number of hashtags
     """
     def getAvgHashTagLength(self):
-        tag_count, size_count = 0, 0
-        for token in self.tokens:
-            if token[0] == '#':
-                tag_count += 1
-                size_count += len(token)
-        return size_count/tag_count
+        if not self.avgHashTagLength:
+            tagCount, sizeCount = 0, 0
+            for token in self.tokens:
+                if token[0] == '#':
+                    tagCount += 1
+                    sizeCount += len(token)
+            self.avgHashTagLength = sizeCount/tagCount
+        return self.avgHashTagLength
 
 
     """
@@ -170,9 +189,45 @@ class Featurizer():
     Output: Array of frequencies for each letter, where each index corresponds to its number in the alphabet
     """
     def getLetterFrequency(self):
-        alphabet=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-        return [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
+        if not self.letterFreq:
+            alphabet = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',\
+                    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',\
+                    's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+            self.letterFreq = [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
+        return self.letterFreq
 
-tweet = " aaa bb cccc dd e y zz"
-F = Featurizer(tweet)
-print(F.getLetterFrequency())
+    def getNgram(self, n):
+        g = {}
+        for seq in ngrams(self.tokens, n):
+            s = ""
+            for w in seq:
+                s += w + " "
+            s = s[:-1]
+            if s in g:
+                g[s] += 1
+            else:
+                g[s] = 1
+        return g 
+
+    def getCharNgram(self, n):
+        g = {}
+        print(ngrams(self.tweet, n))
+        for s in ngrams(self.tweet, n):
+            print(s)
+        for seq in ngrams(self.tweet, n):
+            s = ""
+            for c in seq:
+                s += c
+            if s in g:
+                g[s] += 1
+            else:
+                g[s] = 1
+        return g 
+
+if __name__ == "__main__":
+
+    tweet = " aaa bb cccc dd e y zz"
+    F = Featurizer(tweet)
+    print(F.getNgram(2)) 
+    print(F.getCharNgram(2))
+    print(F.getLetterFrequency())
