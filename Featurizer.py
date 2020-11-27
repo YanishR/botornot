@@ -16,7 +16,18 @@ class Featurizer():
     def __init__(self, tweet):
         self.tokens = tweet.split()
         self.tweet = tweet
+        self.hash_count = None
+        self.rate_count = None
         self.letterFreq = None
+        self.avgWordSize = None
+        self.avgNumPunct = None
+        self.numURL = None
+        self.letterFreq = None
+        self.vocabSize = None
+        self.avgCaps = None
+        self.avgEmojis
+        self.digitFrequency = None
+        self.avgHashTagLength = None
 
 
     """
