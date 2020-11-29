@@ -2,11 +2,7 @@
 import re
 import numpy as np
 from nltk.tag import pos_tag
-
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
-
-# Get ngram computation method
-from nltk import ngrams
 
 
 class Featurizer():
@@ -25,7 +21,7 @@ class Featurizer():
         self.letterFreq = None
         self.vocabSize = None
         self.avgCaps = None
-        self.avgEmojis
+        self.avgEmojis = None
         self.digitFrequency = None
         self.avgHashTagLength = None
 
@@ -84,7 +80,7 @@ class Featurizer():
             for char in self.tweet:
                 if char in punct_set:
                     count += 1
-                
+
             self.avgNumPunct = count/self.getNumTokens()
         return self.avgNumPunct
 
@@ -207,38 +203,11 @@ class Featurizer():
             self.letterFreq = [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
         return self.letterFreq
 
-    def getNgram(self, n):
-        g = {}
-        for seq in ngrams(self.tokens, n):
-            s = ""
-            for w in seq:
-                s += w + " "
-            s = s[:-1]
-            if s in g:
-                g[s] += 1
-            else:
-                g[s] = 1
-        return g 
-
-    def getCharNgram(self, n):
-        g = {}
-        print(ngrams(self.tweet, n))
-        for s in ngrams(self.tweet, n):
-            print(s)
-        for seq in ngrams(self.tweet, n):
-            s = ""
-            for c in seq:
-                s += c
-            if s in g:
-                g[s] += 1
-            else:
-                g[s] = 1
-        return g 
 
 if __name__ == "__main__":
 
     tweet = " aaa bb cccc dd e y zz"
     F = Featurizer(tweet)
-    print(F.getNgram(2)) 
+    print(F.getNgram(2))
     print(F.getCharNgram(2))
     print(F.getLetterFrequency())
