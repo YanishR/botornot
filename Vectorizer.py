@@ -37,6 +37,13 @@ class Vectorizer():
                 return g
 
 
+    """
+    generateNgramID(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    Input:  n    : Integer, Describes n for word/character n grams
+            type : Integer, 0 for word Ngram, anything other integer for character Ngrams
+    Output: word_dict: Returns dictionary of ids for each ngram
+            ngrams: dictionary of word/character ngrams depending on the type
+    """
     def generateNgramID(self, n, type):
         ind = 0
         ngrams = getNgram(n) if type == 0 else getCharNgram(n)
@@ -50,6 +57,12 @@ class Vectorizer():
         return word_dict, ngrams
 
 
+    """
+    getContentMatrix(): Returns the feature matrix for content features
+    Input: cols : Integer, the number of columns in the feature matrix
+           n    : Integer, Describes n for word n grams
+    Output: Numpy Array of dimension(number of tweets, cols)
+    """
     def getContentMatrix(self, cols, n):
         fm = np.zeros( (len(self.tweets)), cols)
 
@@ -67,8 +80,15 @@ class Vectorizer():
             fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
             fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
             fm[i][temp_col + 7] = ft.getNumTokens()
+        return fm
 
 
+    """
+    getStylisticMatrix(): Returns the feature matrix for stylistic features
+    Input: cols : Integer, the number of columns in the feature matrix
+           n    : Integer, Describes n for character n grams
+    Output: Numpy Array of dimension(number of tweets, cols)
+    """
     def getStylisticMatrix(self, cols, n):
         fm = np.zeros( (len(self.tweets)), cols)
 
@@ -89,3 +109,14 @@ class Vectorizer():
             fm[i][temp_col + 6] = ft.getAvgHashTagLength()
             fm[i][temp_col +7] = ft.getLetterFrequency()
             fm[i][temp_col + 8] = ft.getAvgCapitalizations()
+
+        return fm
+
+    """
+    getStylisticMatrix(): Returns the feature matrix for stylistic features and content features concatenated together
+    Input: fm : Numpy Array(float) of dimension(number of tweets, content features) of content features
+           fv   : Numpy Array(float) of dimension(number of tweets, stylsitic features) of stylistic features
+    Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
+    """
+    def getMergedMatrix(self, fm, fv):
+        return np.concatenate((fm,fv), 1)
