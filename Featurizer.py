@@ -173,7 +173,7 @@ class Featurizer():
                 conj_count += 1
             elif tuple[1][0] == 'R' and tuple[1][1] == 'B':
                 adv_count += 1
-        return noun_count, adj_count, adv_count, verb_count, conj_count
+        return noun_count, adj_count, verb_count, adv_count conj_count
 
 
     """

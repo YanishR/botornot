@@ -21,6 +21,7 @@ class Vectorizer():
             g[s] += 1 if s in g else 1
         return g
 
+
     def getCharNgram(self, n):
         g = {}
         for tweet in self.tweets:
@@ -46,18 +47,24 @@ class Vectorizer():
 
         return word_dict, ngrams
 
-    def getContentMatrix(self, cols, n, type):
+
+    def getContentMatrix(self, cols, n):
         fm = np.zeros( (len(self.tweets)), cols)
+
         for i in range(len(self.tweets)):
             temp_col = 0
             ft = Featurizer(self.tweets[i])
-            word_dict, ngrams = generateNgramID(n, type)
-            for word in ft.:
+            word_dict, ngrams = generateNgramID(n)
+            for word in ft.tweet:
                 fm[i][temp_col] =
-
-
-
-
+                temp_col += 1
+            fm[i][temp_col] = ft.getAvgEmojis()
+            temp_col += 1
+            fm[i][temp_col] = ft.getNumURL()
+            temp_col += 1
+            fm[i][temp_col], fm[i][temp_col+1] = ft.getNumTags()
+            temp_col += 2
+            fm[i][temp_col], fm[i][temp_col + 1], fm[i][temp_col + 2], dummy, dummy2 = ft.getPOSTaggedDistribution()
 
 
     def getStylisticMatrix(self):
