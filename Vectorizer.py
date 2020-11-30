@@ -107,8 +107,13 @@ class Vectorizer():
             dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = ft.getPOSTaggedDistribution()
             fm[i][temp_col + 5] = ft.getDigitFrequency()
             fm[i][temp_col + 6] = ft.getAvgHashTagLength()
-            fm[i][temp_col +7] = ft.getLetterFrequency()
-            fm[i][temp_col + 8] = ft.getAvgCapitalizations()
+            fm[i][temp_col + 7] = ft.getAvgCapitalizations()
+
+            letters = ft.getLetterFrequency()
+            idx = 0
+            for j in range(temp_col+8, temp_col+33):
+                fm[i][j] = letters[idx]
+                idx += 1
 
         return fm
 
