@@ -3,6 +3,7 @@ import re
 import numpy as np
 from nltk.tag import pos_tag
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
+from nltk import ngrams
 
 
 class Featurizer():
@@ -26,6 +27,49 @@ class Featurizer():
         self.avgHashTagLength = None
 
 
+    """
+    generateNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    Input:  n    : Integer, Describes n for word/character n grams
+            type : Integer, 0 for word Ngram, anything other integer for character Ngrams
+    Output: word_dict: Returns dictionary of ids for each ngram
+            ngrams: dictionary of word/character ngrams depending on the type
+    """
+    def getNgram(self, n):
+        g = {}
+        for seq in ngrams(self.tokens, n):
+            s = ""
+            for w in seq:
+                s += w + " "
+            s = s[:-1]
+            if s in g:
+                g[s] += 1
+            else:
+                g[s] = 1
+
+        return g
+
+    """
+    generateNCharNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    Input:  n    : Integer, Describes n for word/character n grams
+            type : Integer, 0 for word Ngram, anything other integer for character Ngrams
+    Output: word_dict: Returns dictionary of ids for each ngram
+            ngrams: dictionary of word/character ngrams depending on the type
+    """
+    def getCharNgram(self, n):
+        g = {}
+
+        for seq in ngrams(tweet, n):
+            s = ""
+
+            for c in seq:
+                s += c
+
+            if s in g:
+                g[s] += 1
+            else:
+                g[s] = 1
+
+        return g
     """
     getNumTags(): Returns the number of hashtags and the number of @ mentions
     Output: Integer number of hashtag tokens in the particular tweet
@@ -173,7 +217,7 @@ class Featurizer():
                 conj_count += 1
             elif tuple[1][0] == 'R' and tuple[1][1] == 'B':
                 adv_count += 1
-        return noun_count, adj_count, verb_count, adv_count conj_count
+        return noun_count, adj_count, verb_count, adv_count, conj_count
 
 
     """

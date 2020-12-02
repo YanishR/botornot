@@ -1,4 +1,4 @@
-from tweet.py import Data
+from dataparserpy import Data
 from sklearn.svm import SVC, LinearSVC
 from sklearn import metrics
 from sklearn.multiclass import OneVsOneClassifier
