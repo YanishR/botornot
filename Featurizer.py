@@ -51,6 +51,7 @@ class Featurizer():
 
         return g
 
+
     """
     generateNCharNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
     Input:  n    : Integer, Describes n for word/character n grams
@@ -73,6 +74,8 @@ class Featurizer():
                 g[s] = 1
 
         return g
+
+
     """
     getNumTags(): Returns the number of hashtags and the number of @ mentions
     Output: Integer number of hashtag tokens in the particular tweet
@@ -101,6 +104,7 @@ class Featurizer():
     """
     def getNumTokens(self):
         return len(self.tokens)
+
 
     """
     getAvgWordSize(): Returns the average word size (character length) in a tweet
@@ -131,6 +135,7 @@ class Featurizer():
             self.avgNumPunct = count/self.getNumTokens()
         return self.avgNumPunct
 
+
     """
     getNumURL(): Returns the number of URLs in a tweet
     Output: Integer number of URLs in a given string tweet
@@ -145,6 +150,7 @@ class Featurizer():
 
         return self.numURL
 
+
     """
     getNumTokens(): Returns the number of tokens in a tweet
     Output: Integer number of tokens in the particular tweet
@@ -154,6 +160,7 @@ class Featurizer():
         if not self.vocabSize:
             self.vocabSize = len(set([word.lower() for word in self.tokens]))
         return self.vocabSize
+
 
     """
     getAvgCapitalizations(): Returns the average number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
@@ -257,20 +264,20 @@ class Featurizer():
                   and emojis with <emj>. It also removes all stop words.
     Output: Preprocessed string tweeet
     """
-    def preprocess(self):
+    def preprocess(self, stopwords = 0, emoji = 0, hashtag = 0, user = 0, url = 0):
         str = ""
         self.getNumURL()
         stop_words = set(stopwords.words('english'))
         for token in self.tokens:
-            if token[0] == '#':
+            if hashtag == 0 and token[0] == '#':
                 str += "<hashtag> "
-            elif token[0] == '@':
+            elif user == 0 and token[0] == '@':
                 str += "<user> "
-            elif token in self.urls:
+            elif url == 0 and token in self.urls:
                 str += "<url> "
-            elif token in UNICODE_EMOJI:
+            elif emoji == 0 and token in UNICODE_EMOJI:
                 str += "<emj> "
-            elif token in stop_words:
+            elif stopwords == 0 and token in stop_words:
                 str += ""
             else:
                 str += token + " "
