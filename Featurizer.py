@@ -4,13 +4,15 @@ import numpy as np
 from nltk.tag import pos_tag
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 from nltk import ngrams
+#nltk.download('stopwords') if stop words not downloaded already
+from nltk.corpus import stopwords
 
 
 class Featurizer():
     # Need to improve object oriented design further in the future
     # initializes object data
 
-    def __init__(self, tweet):
+    def __init__(self, tweet, preprocess = 0):
         self.tokens = tweet.split()
         self.tweet = tweet
         self.hash_count = None
@@ -25,6 +27,7 @@ class Featurizer():
         self.avgEmojis = None
         self.digitFrequency = None
         self.avgHashTagLength = None
+        self.urls = None
 
 
     """
@@ -48,6 +51,7 @@ class Featurizer():
 
         return g
 
+
     """
     generateNCharNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
     Input:  n    : Integer, Describes n for word/character n grams
@@ -70,6 +74,8 @@ class Featurizer():
                 g[s] = 1
 
         return g
+
+
     """
     getNumTags(): Returns the number of hashtags and the number of @ mentions
     Output: Integer number of hashtag tokens in the particular tweet
@@ -98,6 +104,7 @@ class Featurizer():
     """
     def getNumTokens(self):
         return len(self.tokens)
+
 
     """
     getAvgWordSize(): Returns the average word size (character length) in a tweet
@@ -128,6 +135,7 @@ class Featurizer():
             self.avgNumPunct = count/self.getNumTokens()
         return self.avgNumPunct
 
+
     """
     getNumURL(): Returns the number of URLs in a tweet
     Output: Integer number of URLs in a given string tweet
@@ -137,9 +145,11 @@ class Featurizer():
             #regex citation: GeeksForGeeks
             regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             url = re.findall(regex,self.tweet)
-            self.numURL = len([x[0] for x in url])
+            self.urls = [x[0] for x in url]
+            self.numURL = len(self.urls)
 
         return self.numURL
+
 
     """
     getNumTokens(): Returns the number of tokens in a tweet
@@ -150,6 +160,7 @@ class Featurizer():
         if not self.vocabSize:
             self.vocabSize = len(set([word.lower() for word in self.tokens]))
         return self.vocabSize
+
 
     """
     getAvgCapitalizations(): Returns the average number of capitalized tokens in a tweet normalized by the number of tokens in the tweet
@@ -248,10 +259,36 @@ class Featurizer():
         return self.letterFreq
 
 
+    """
+    preprocess(): Preprocesses the tweet to replace hashtag with <hashtag>, mentions with "<user>", any URL with <URL>,
+                  and emojis with <emj>. It also removes all stop words.
+    Output: Preprocessed string tweeet
+    """
+    def preprocess(self, stopwords = 0, emoji = 0, hashtag = 0, user = 0, url = 0):
+        str = ""
+        self.getNumURL()
+        stop_words = set(stopwords.words('english'))
+        for token in self.tokens:
+            if hashtag == 0 and token[0] == '#':
+                str += "<hashtag> "
+            elif user == 0 and token[0] == '@':
+                str += "<user> "
+            elif url == 0 and token in self.urls:
+                str += "<url> "
+            elif emoji == 0 and token in UNICODE_EMOJI:
+                str += "<emj> "
+            elif stopwords == 0 and token in stop_words:
+                str += ""
+            else:
+                str += token + " "
+        return str.strip()
+
+
 if __name__ == "__main__":
 
-    tweet = " aaa bb cccc dd e y zz"
+    tweet = " aaa bb cccc dd e y zz www.google.com @kartikey #NLP suvinay coded this \U0001F924 "
     F = Featurizer(tweet)
-    print(F.getNgram(2))
-    print(F.getCharNgram(2))
-    print(F.getLetterFrequency())
+    # print(F.getNgram(2))
+    # print(F.getCharNgram(2))
+    # print(F.getLetterFrequency())
+    print(F.preprocess())
