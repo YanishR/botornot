@@ -5,18 +5,18 @@ import csv
 
 class Data:
 
-    def __init__(self, trollTweetsFileName, realTweetsFileName):
+    def __init__(self, realTweetsFileName,trollTweetsFileName):
 
-        self.trollTweets = readFile(trollTweetsFileName, 2)
         self.realTweets = readFile(realTweetsFileName, 11)
+        self.trollTweets = readFile(trollTweetsFileName, 2)
             
 
+    def getRealTweets(self):
+        return self.realTweets
 
     def getTrollTweets(self):
         return self.trollTweets
 
-    def getRealTweets(self):
-        return self.realTweets
 
     def getAllTweets(self):
         return self.trollTweets + self.realTweets
@@ -38,10 +38,11 @@ def readFile(fileName, tPos):
     return tweets
 
 if __name__ == "__main__":
-    electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     electionTweets = "./data/2016_US_election_tweets_100k.csv"
 
+    electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     tweets = Data(electionTrolls, electionTweets)
+
     tweets.getSplitData()

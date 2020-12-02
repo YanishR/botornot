@@ -56,8 +56,9 @@ def results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel
         print(metric + " : " + str(score))
 
 if __name__ == "__main__":
-    print("hello")
-    d = Data("./data/")
+    electionTweets = "./data/2016_US_election_tweets_100k.csv"
+    electionTrolls = "./data/russian-troll-tweets/IRAhandle_tweets_1.csv"
+    d = Data(electionTweets, electionTrolls)
     X_train, Y_train, X_test, Y_test = d.getSplitData()
     results(X_train, Y_train, X_test, Y_test)
     # results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 1, degree = 2) #Poly kernel
