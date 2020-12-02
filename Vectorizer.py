@@ -1,6 +1,5 @@
 import Featurizer
 import numpy as np
-from nltk import ngrams
 
 class Vectorizer():
 
@@ -9,32 +8,40 @@ class Vectorizer():
         pass
 
 
-    def getNgram(self, n):
+    """
+    generateNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    Input:  n    : Integer, Describes n for word/character n grams
+            type : Integer, 0 for word Ngram, anything other integer for character Ngrams
+    Output: word_dict: Returns dictionary of ids for each ngram
+            ngrams: dictionary of word/character ngrams depending on the type
+    """
+    def genNgram(self, n):
         g = {}
         for tweet in self.tweets:
-
-            for seq in ngrams(tweet.split(), n):
-                s = ""
-            for w in seq:
-                s += w + " "
-
-            s = s[:-1]
-            g[s] += 1 if s in g else 1
+            for ngram in tweet.getNgram():
+                if ngram in g:
+                    g[ngram] += 1
+                else:
+                    g[ngram] = 1
         return g
 
 
+    """
+    generateNCharNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    Input:  n    : Integer, Describes n for word/character n grams
+            type : Integer, 0 for word Ngram, anything other integer for character Ngrams
+    Output: word_dict: Returns dictionary of ids for each ngram
+            ngrams: dictionary of word/character ngrams depending on the type
+    """
     def getCharNgram(self, n):
         g = {}
         for tweet in self.tweets:
-
-            for seq in ngrams(tweet, n):
-                s = ""
-
-                for c in seq:
-                    s += c
-
-                g[s] += 1 if s in g else 1
-                return g
+            for gram in tweet.getCharNgram:
+                if gram in g:
+                    g[gram] += 1
+                else:
+                    g[gram] = 1
+        return g
 
 
     """
@@ -44,14 +51,14 @@ class Vectorizer():
     Output: word_dict: Returns dictionary of ids for each ngram
             ngrams: dictionary of word/character ngrams depending on the type
     """
-    def generateNgramID(self, n, type):
+    def generateNgramID(self, n, choice):
         ind = 0
-        ngrams = getNgram(n) if type == 0 else getCharNgram(n)
+        ngrams = getNgram(n) if choice == 0 else getCharNgram(n)
         word_dict = {}
 
-        for word in ngrams:
-            if word not in word_dict:
-                word_dict[word] = ind
+        for seq in ngrams:
+            if seq not in word_dict:
+                word_dict[seq] = ind
                 ind += 1
 
         return word_dict, ngrams
@@ -64,14 +71,19 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, cols)
     """
     def getContentMatrix(self, cols, n):
-        fm = np.zeros( (len(self.tweets)), cols)
+        fm = np.zeros((len(self.tweets)), cols)
 
         for i in range(len(self.tweets)):
             temp_col = 0
             ft = Featurizer(self.tweets[i])
             word_dict, ngrams = generateNgramID(n, 0)
 
-            for word in ft.tweet: #NOTE DO THIS
+            for seq in ft.getNgram(): #NOTE DO THIS
+                if word_dict[seq] in fm[i]:
+                    fm[i][word_dict[seq]] += 1
+                else:
+                    fm[i][word_dict[seq]] = 1
+                    
                 fm[i][temp_col] = 0
                 temp_col += 1
 
@@ -80,6 +92,7 @@ class Vectorizer():
             fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
             fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
             fm[i][temp_col + 7] = ft.getNumTokens()
+
         return fm
 
 
@@ -125,3 +138,6 @@ class Vectorizer():
     """
     def getMergedMatrix(self, fm, fv):
         return np.concatenate((fm,fv), 1)
+
+if __name__ == "__main__":
+    print("Running main")
