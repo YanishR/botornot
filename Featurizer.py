@@ -4,13 +4,15 @@ import numpy as np
 from nltk.tag import pos_tag
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 from nltk import ngrams
+#nltk.download('stopwords') if stop words not downloaded already
+from nltk.corpus import stopwords
 
 
 class Featurizer():
     # Need to improve object oriented design further in the future
     # initializes object data
 
-    def __init__(self, tweet):
+    def __init__(self, tweet, preprocess = 0):
         self.tokens = tweet.split()
         self.tweet = tweet
         self.hash_count = None
@@ -25,6 +27,7 @@ class Featurizer():
         self.avgEmojis = None
         self.digitFrequency = None
         self.avgHashTagLength = None
+        self.urls = None
 
 
     """
@@ -137,7 +140,8 @@ class Featurizer():
             #regex citation: GeeksForGeeks
             regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             url = re.findall(regex,self.tweet)
-            self.numURL = len([x[0] for x in url])
+            self.urls = [x[0] for x in url]
+            self.numURL = len(self.urls)
 
         return self.numURL
 
@@ -248,10 +252,31 @@ class Featurizer():
         return self.letterFreq
 
 
+    def preprocess(self):
+        str = ""
+        self.getNumURL()
+        stop_words = set(stopwords.words('english'))
+        for token in self.tokens:
+            if token[0] == '#':
+                str += "<hashtag> "
+            elif token[0] == '@':
+                str += "<user> "
+            elif token in self.urls:
+                str += "<url> "
+            elif token in UNICODE_EMOJI:
+                str += "<emj> "
+            elif token in stop_words:
+                str += ""
+            else:
+                str += token + " "
+        return str.strip()
+
+
 if __name__ == "__main__":
 
-    tweet = " aaa bb cccc dd e y zz"
+    tweet = " aaa bb cccc dd e y zz www.google.com @kartikey #NLP suvinay coded this \U0001F924 "
     F = Featurizer(tweet)
-    print(F.getNgram(2))
-    print(F.getCharNgram(2))
-    print(F.getLetterFrequency())
+    # print(F.getNgram(2))
+    # print(F.getCharNgram(2))
+    # print(F.getLetterFrequency())
+    print(F.preprocess())
