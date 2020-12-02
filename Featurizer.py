@@ -252,6 +252,11 @@ class Featurizer():
         return self.letterFreq
 
 
+    """
+    preprocess(): Preprocesses the tweet to replace hashtag with <hashtag>, mentions with "<user>", any URL with <URL>
+                  and emojis with <emj>
+    Output: Preprocessed string tweeet
+    """
     def preprocess(self):
         str = ""
         self.getNumURL()
