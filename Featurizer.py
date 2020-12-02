@@ -253,8 +253,8 @@ class Featurizer():
 
 
     """
-    preprocess(): Preprocesses the tweet to replace hashtag with <hashtag>, mentions with "<user>", any URL with <URL>
-                  and emojis with <emj>
+    preprocess(): Preprocesses the tweet to replace hashtag with <hashtag>, mentions with "<user>", any URL with <URL>,
+                  and emojis with <emj>. It also removes all stop words.
     Output: Preprocessed string tweeet
     """
     def preprocess(self):
