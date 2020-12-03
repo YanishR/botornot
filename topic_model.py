@@ -22,7 +22,6 @@ class TopicModel:
         self.df_tweets = self.cv_tweets.transform(self.tweets)
 
 
-
         self.lda_tweets = LatentDirichletAllocation(n_components = 20, learning_method = 'online', random_state = 42)
 
         self.doc_top = self.lda_tweets.fit_transform(self.df_tweets)
