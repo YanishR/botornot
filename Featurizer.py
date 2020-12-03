@@ -9,10 +9,17 @@ from nltk.corpus import stopwords
 
 
 class Featurizer():
-    # Need to improve object oriented design further in the future
     # initializes object data
-
-    def __init__(self, tweet, preprocess = 0):
+    """Constructor for featurizer object, extract features for one tweet at a time
+       Input: tweet: String that represents the tweet
+              preprocess (optional) : Integer, 0 for no preprocessing, anything else for preprocessing
+              stop_words (optional) : Integer, Indicate if stopwords are to be removed if not 0
+              emoji (optional) : Integer, Indicate if emojis are to be replaced by <emj> if not 0
+              hashtags (optional) : Integer, Indicate if hashtags are to be replaced by <hashtag> if not 0
+              user (optional) : Integer, Indicate if @ mentions are to be replaced <user> if not 0
+              url (optional) : Integer, Indicate whether urls are to be replaced by <url> if not 0
+    """
+    def __init__(self, tweet, preprocess = 0, stop_words = 0, emoji = 0, hashtag = 0, url = 0, user = 0):
         self.tokens = tweet.split()
         self.tweet = tweet
         self.hash_count = None
@@ -28,6 +35,9 @@ class Featurizer():
         self.digitFrequency = None
         self.avgHashTagLength = None
         self.urls = None
+        if preprocess != 0:
+            self.tweet = self.preprocess(stop_words, emoji, hashtag, user, url)
+            self.tokens = self.tweet.split()
 
 
     """
