@@ -8,13 +8,12 @@ import numpy as np
 class TopicModel:
     # given an address to a dataset of legit tweets and another to fake tweets, constructs a TopicModel object
     def __init__(self, legit, fake):
-        electionTweets = Data(legit)
+        electionTweets = Data(legit, fake)
 
-        electionTrolls = Data(fake, True)
 
-        self.legit = electionTweets.getTweets()[:1000]
+        self.legit = electionTweets.getRealTweets()[:1000]
 
-        self.fake = electionTrolls.getTweets()[:1000]
+        self.fake = electionTweets.getTrollTweets()[:1000]
 
         self.tweets = self.legit + self.fake
 
@@ -52,11 +51,12 @@ class TopicModel:
 
         return topic_vector
 
-# electionTweets = "./data/2016_US_election_tweets_100k.csv"
-#
-# electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
 if __name__ == "__main__":
+    electionTweets = "./data/2016_US_election_tweets_100k.csv"
+
+    electionTrolls = "./data/IRAhandle_tweets_1.csv"
+
     tc = TopicModel("./data/2016_US_election_tweets_100k.csv", "./data/IRAhandle_tweets_1.csv")
 
     print(tc.classify("i'm going to vote for hillary clinton, thanks!"))

@@ -6,7 +6,6 @@ import csv
 class Data:
 
     def __init__(self, realTweetsFileName,trollTweetsFileName):
-
         self.realTweets = readFile(realTweetsFileName, 11)
         self.trollTweets = readFile(trollTweetsFileName, 2)
             
