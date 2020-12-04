@@ -2,10 +2,15 @@
 # and read the content, time, likes,
 # retweets, media and so on
 import csv
+from tweet import Tweet
+
+from random import seed
+from random import randint
+import datetime
 
 class Data:
 
-    def __init__(self, realTweetsFileName,trollTweetsFileName):
+    def __init__(self, realTweetsFileName, trollTweetsFileName):
         self.realTweets = readFile(realTweetsFileName, 11)
         self.trollTweets = readFile(trollTweetsFileName, 2)
             
@@ -26,6 +31,28 @@ class Data:
                 self.realTweets[int(len(self.realTweets)/4):],\
                 self.trollTweets[int(len(self.trollTweets)/4):]
 
+    def getRandomizedSplitData(self, split=70):
+        R_train, R_test = self.getRandomData(split, self.realTweets)
+        T_train, T_test = self.getRandomData(split, self.trollTweets) 
+        return R_train, T_train, R_test, T_test
+
+    def getRandomData(self, split, tweetSet):
+        train, test = [], []
+        tweetsUsed = {}
+        seed(datetime.datetime.now().second)
+
+        while len(train) < split/100*len(tweetSet):
+            value = randint(0, len(tweetSet) -1)
+            if value not in tweetsUsed:
+                tweetsUsed[value] = True
+                train.append(tweetSet[value])
+
+        for i in range(len(tweetSet)):
+            if i not in tweetsUsed:
+                test.append(tweetSet[i])
+
+        return train, test 
+
 def readFile(fileName, tPos):
     tweets = []
     with open(fileName) as csvfile:
@@ -33,7 +60,7 @@ def readFile(fileName, tPos):
         for row in reader:
             if len(row) > 10:
                 if row[tPos] != "" and row[tPos] != " ":
-                    tweets.append(row[tPos])
+                    tweets.append(Tweet(row[tPos]))
     return tweets
 
 if __name__ == "__main__":
@@ -42,6 +69,6 @@ if __name__ == "__main__":
 
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
-    tweets = Data(electionTrolls, electionTweets)
+    tweets = Data(electionTweets, electionTrolls)
 
-    tweets.getSplitData()
+    print(tweets.getRandomizedSplitData())

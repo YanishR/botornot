@@ -7,13 +7,13 @@ import numpy as np
 # class to implement topic model using Latent Dirichlet Allocation
 class TopicModel:
     # given an address to a dataset of legit tweets and another to fake tweets, constructs a TopicModel object
-    def __init__(self, legit, fake):
-        electionTweets = Data(legit, fake)
+    def __init__(self, data):
 
-
-        self.legit = electionTweets.getRealTweets()[:1000]
-
-        self.fake = electionTweets.getTrollTweets()[:1000]
+        self.legit, self.fake = [], []
+        for tweet in data.getRealTweets()[:1000]:
+            self.legit.append(tweet.getText())
+        for tweet in data.getTrollTweets()[:1000]:
+            self.fake.append(tweet.getText())
 
         self.tweets = self.legit + self.fake
 
@@ -56,7 +56,9 @@ if __name__ == "__main__":
 
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
-    tc = TopicModel("./data/2016_US_election_tweets_100k.csv", "./data/IRAhandle_tweets_1.csv")
+    data = Data(electionTweets, electionTrolls)
+
+    tc = TopicModel(data)
 
     print(tc.classify("i'm going to vote for hillary clinton, thanks!"))
     print(tc.topic_vectorize("please vote for donald trump"))

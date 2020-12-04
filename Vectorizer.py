@@ -1,38 +1,47 @@
-from tweet.py import Tweet
+from tweet import Tweet
+from dataparser import Data
 import numpy as np
 
 """
 Vectorizer:
-    Class that transforms two lists of troll Tweets and real Tweets
+    Class that transforms troll Tweets and real Tweets into
+    a content and stylistic matrix
 """
 class Vectorizer():
 
-    def __init__(self, realTweets, trollTweets):
-        self.trollTweets = []
-        self.realTweets = []
+    def __init__(self, data):
+        self.realTrain, self.trollTrain, self.realTest, self.trollTest = data.getRandomizedSplitData()
 
-        for tweet in trollTweets:
-            self.trollTweets.append(Tweet(tweet))
-        for tweet in realTweets:
-            self.realTweets.append(Tweet(tweet))
-
+        self.tweets = data.getAllTweets()
 
     """
-    generateNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
+    genGram(): Generate dictionary of ngrams or charngrams depending on 
+    char's boolean value
+    Input:  n    : Integer describing n for word/character n grams
+            char : boolean value determining whether this is a word ngram
+            or char n gram
+    Output: dict g: dictionary of ngrams or char ngrams and their occurences
+    """
+    def genGram(self, n, char=False):
+        g = {}
+        for tweet in self.tweets:
+            gram = tweet.getNgram(n) if char==False else tweet.getCharNgram(n)
+            for ngram in gram:
+                if ngram in g:
+                    g[ngram] += 1
+                else:
+                    g[ngram] = 1
+        return g
+
+    """
+    genNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
     Input:  n    : Integer, Describes n for word/character n grams
             type : Integer, 0 for word Ngram, anything other integer for character Ngrams
     Output: word_dict: Returns dictionary of ids for each ngram
             ngrams: dictionary of word/character ngrams depending on the type
     """
     def genNgram(self, n):
-        g = {}
-        for tweet in self.tweets:
-            for ngram in tweet.getNgram(n):
-                if ngram in g:
-                    g[ngram] += 1
-                else:
-                    g[ngram] = 1
-        return g
+        return self.genGram(n)
 
 
     """
@@ -42,16 +51,8 @@ class Vectorizer():
     Output: word_dict: Returns dictionary of ids for each ngram
             ngrams: dictionary of word/character ngrams depending on the type
     """
-    def getCharNgram(self, n):
-        g = {}
-        for tweet in self.tweets:
-            for gram in tweet.getCharNgram(n):
-                if gram in g:
-                    g[gram] += 1
-                else:
-                    g[gram] = 1
-        return g
-
+    def genCharNgram(self, n):
+        return self.genGram(n, True)
 
     """
     generateNgramID(): Returns dictionary of ids for each ngram and a dictionary of ngrams
@@ -60,20 +61,21 @@ class Vectorizer():
     Output: word_dict: Returns dictionary of ids for each ngram
             ngrams: dictionary of word/character ngrams depending on the type
     """
-    def generateNgramID(self, n, choice):
+    def generateNgramID(self, n, charGram=False):
         ind = 0
+        ngram_dict = {}
 
-        ngrams = getNgram(n) if choice == 0 else getCharNgram(n)
+        grams = self.genNgram(n) if charGram == False else self.genCharNgram(n)
 
-        word_dict = {}
-
-        for seq in ngrams:
-            if seq not in word_dict:
-                word_dict[seq] = ind
+        for seq in grams:
+            if seq not in ngram_dict:
+                ngram_dict[seq] = ind
                 ind += 1
 
-        self.wd = word_dict
-        return word_dict, ngrams
+        self.gd = ngram_dict # gram dictionary
+        self.ngrams = grams 
+
+        return ngram_dict, grams
 
 
     """
@@ -82,16 +84,18 @@ class Vectorizer():
            n    : Integer, Describes n for word n grams
     Output: Numpy Array of dimension(number of tweets, cols)
     """
-    def getContentMatrix(self, n, cols):
-        self.generateNgramID(n, 0)
-        fm = np.zeros((len(self.tweets)), cols)
+    def getContentMatrix(self, n, tweetSet):
+        self.generateNgramID(n, False)
 
-        for i in range(len(self.realTweets)):
-            temp_col = 0
+        fm = np.zeros((len(self.tweets), len(self.ngrams) + 8))
+        temp_col = len(self.ngrams)
 
-            for seq in self.realTweets[i].getNgram(n):
-                fm[i][temp_col]] = float(self.wd[seq])
-                temp_col += 1
+        for i in range(len(self.tweets)):
+
+            ft = self.tweets[i]
+            tweetNgram = ft.getNgram(n)
+            for seq in tweetNgram:
+                fm[i][self.gd[seq]] = float(tweetNgram[seq])
 
             fm[i][temp_col] = ft.getAvgEmojis()
             fm[i][temp_col + 1] = ft.getNumURL()
@@ -108,30 +112,34 @@ class Vectorizer():
            n    : Integer, Describes n for character n grams
     Output: Numpy Array of dimension(number of tweets, cols)
     """
-    def getStylisticMatrix(self, cols, n):
-        self.generateNgramID(n, 1)
-        fm = np.zeros( (len(self.tweets)), cols)
-        self.generateNgramID(n, 1)
+    def getStylisticMatrix(self, n, tweetSet):
+        self.generateNgramID(n, True)
+        fm = np.zeros( (len(self.tweets), len(self.ngrams) + 34))
 
-        for i in range(len(self.realTweets)):
-            temp_col = 0
+        temp_col = len(self.ngrams)
 
-            for seq in self.realTweets[i].getCharNgram(n):
-                fm[i][temp_col] = float(self.wd[seq])
-                temp_col += 1
+        for i in range(len(tweetSet)):
+            t = tweetSet[i]
+            tweetCharGram = t.getCharNgram(n)
+            
+            for seq in tweetCharGram:
+                fm[i][self.gd[seq]] = tweetCharGram[seq] 
 
-            fm[i][temp_col] = ft.getAvgNumPunct()
-            fm[i][temp_col + 1] = ft.getAvgWordSize()
-            fm[i][temp_col + 2] = ft.getVocabSize()
-            dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = ft.getPOSTaggedDistribution()
-            fm[i][temp_col + 5] = ft.getDigitFrequency()
-            fm[i][temp_col + 6] = ft.getAvgHashTagLength()
-            fm[i][temp_col + 7] = ft.getAvgCapitalizations()
+            fm[i][temp_col] = t.getAvgNumPunct()
+            fm[i][temp_col + 1] = t.getAvgWordSize()
+            fm[i][temp_col + 2] = t.getVocabSize()
+            dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = t.getPOSTaggedDistribution()
+            fm[i][temp_col + 5] = t.getDigitFrequency()
+            fm[i][temp_col + 6] = t.getAvgHashTagLength()
+            fm[i][temp_col + 7] = t.getAvgCapitalizations()
 
-            letters = ft.getLetterFrequency()
+            letters = t.getLetterFrequency()
             idx = 0
-            for j in range(temp_col+8, temp_col+33):
+
+            for j in range(temp_col + 8, temp_col+33):
+
                 fm[i][j] = letters[idx]
+
                 idx += 1
 
         return fm
@@ -142,14 +150,26 @@ class Vectorizer():
            fv   : Numpy Array(float) of dimension(number of tweets, stylsitic features) of stylistic features
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
-    def getMergedMatrix(self, fm, fv):
+    def getMergedMatrix(self, tweetSet, n):
+        fm = self.getContentMatrix(n, tweetSet)
+        fv = self.getStylisticMatrix(n, tweetSet)
         return np.concatenate((fm,fv), 1)
+
+    def getSplitData(self, n):
+        R_train = self.getMergedMatrix(self.realTrain, n) 
+        T_train = self.getMergedMatrix(self.trollTrain, n)
+        R_test= self.getMergedMatrix(self.realTest, n)
+        T_test = self.getMergedMatrix(self.trollTest, n)
+        return R_train, T_train, R_test, T_test
+
+
 
 if __name__ == "__main__":
     print("Running main")
     electionTweets = "./data/2016_US_election_tweets_100k.csv"
-    electionTrolls = "./data/russian-troll-tweets/IRAhandle_tweets_1.csv"
+    electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     d = Data(electionTweets, electionTrolls)
-    f = Vectorizer(d.getRealTweets(), d.getTrollTweets())
+    f = Vectorizer(d)
+    f.getSplitData(1)
 
