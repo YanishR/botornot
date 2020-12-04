@@ -19,9 +19,11 @@ class Featurizer():
               user (optional) : Integer, Indicate if @ mentions are to be replaced <user> if not 0
               url (optional) : Integer, Indicate whether urls are to be replaced by <url> if not 0
     """
-    def __init__(self, tweet, preprocess = 0, stop_words = 0, emoji = 0, hashtag = 0, url = 0, user = 0):
+    def __init__(self, tweet, likes = 0, retweets = 0, preprocess = 0, stop_words = 0, emoji = 0, hashtag = 0, url = 0, user = 0):
         self.tokens = tweet.split()
         self.tweet = tweet
+        self.likes = likes
+        self.retweets = retweets
         self.hash_count = None
         self.rate_count = None
         self.letterFreq = None
@@ -292,6 +294,14 @@ class Featurizer():
             else:
                 str += token + " "
         return str.strip()
+
+
+        def getLikes(self):
+            return self.likes
+
+
+        def getRetweets(self):
+            return self.retweets
 
 
 if __name__ == "__main__":
