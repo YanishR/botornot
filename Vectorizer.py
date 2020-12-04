@@ -15,7 +15,7 @@ class Vectorizer():
         self.tweets = data.getAllTweets()
 
     """
-    genGram(): Generate dictionary of ngrams or charngrams depending on 
+    genGram(): Generate dictionary of ngrams or charngrams depending on
     char's boolean value
     Input:  n    : Integer describing n for word/character n grams
             char : boolean value determining whether this is a word ngram
@@ -73,7 +73,7 @@ class Vectorizer():
                 ind += 1
 
         self.gd = ngram_dict # gram dictionary
-        self.ngrams = grams 
+        self.ngrams = grams
 
         return ngram_dict, grams
 
@@ -121,9 +121,9 @@ class Vectorizer():
         for i in range(len(tweetSet)):
             t = tweetSet[i]
             tweetCharGram = t.getCharNgram(n)
-            
+
             for seq in tweetCharGram:
-                fm[i][self.gd[seq]] = tweetCharGram[seq] 
+                fm[i][self.gd[seq]] = tweetCharGram[seq]
 
             fm[i][temp_col] = t.getAvgNumPunct()
             fm[i][temp_col + 1] = t.getAvgWordSize()
@@ -156,11 +156,20 @@ class Vectorizer():
         return np.concatenate((fm,fv), 1)
 
     def getSplitData(self, n):
-        R_train = self.getMergedMatrix(self.realTrain, n) 
+        R_train = self.getMergedMatrix(self.realTrain, n)
         T_train = self.getMergedMatrix(self.trollTrain, n)
         R_test= self.getMergedMatrix(self.realTest, n)
         T_test = self.getMergedMatrix(self.trollTest, n)
         return R_train, T_train, R_test, T_test
+
+
+    def getTrendMatrix(self):
+        fm = np.zeros( (len(self.tweets), 2)
+        for i in range(len(self.tweets)):
+            ft = Featurizer(self.tweets[i])
+            fm[i][0] = ft.getLikes()
+            fm[i][1] = ft.getRetweets()
+
 
 
 
@@ -172,4 +181,3 @@ if __name__ == "__main__":
     d = Data(electionTweets, electionTrolls)
     f = Vectorizer(d)
     f.getSplitData(1)
-
