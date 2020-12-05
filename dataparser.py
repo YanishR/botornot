@@ -4,8 +4,10 @@
 import csv
 from tweet import Tweet
 
+from sklearn.model_selection import train_test_split
 from random import seed
 from random import randint
+
 import datetime
 
 class Data:
@@ -13,7 +15,12 @@ class Data:
     def __init__(self, realTweetsFileName, trollTweetsFileName):
         self.realTweets = readFile(realTweetsFileName, 11)
         self.trollTweets = readFile(trollTweetsFileName, 2)
-            
+
+        m = min(len(self.realTweets), len(self.trollTweets))
+
+        self.realTweets = self.realTweets[:m]
+        self.trollTweets = self.trollTweets[:m]
+        self.tweets = self.realTweets + self.trollTweets
 
     def getRealTweets(self):
         return self.realTweets
@@ -21,37 +28,23 @@ class Data:
     def getTrollTweets(self):
         return self.trollTweets
 
-
     def getAllTweets(self):
-        return self.trollTweets + self.realTweets
+        return self.tweets
 
-    def getSplitData(self):
-        return self.realTweets[:int(len(self.realTweets)/4)],\
-                self.trollTweets[:int(len(self.trollTweets)/4)],\
-                self.realTweets[int(len(self.realTweets)/4):],\
-                self.trollTweets[int(len(self.trollTweets)/4):]
+    def getRandomSplitData(self, testSize):
+        y = ['r'] * len(self.realTweets)
+        y += ['t'] * len(self.trollTweets)
+        X_train, X_test, y_train, y_test =\
+                train_test_split(self.tweets, y, test_size = testSize, shuffle=True)
 
-    def getRandomizedSplitData(self, split=70):
-        R_train, R_test = self.getRandomData(split, self.realTweets)
-        T_train, T_test = self.getRandomData(split, self.trollTweets) 
-        return R_train, T_train, R_test, T_test
+        return X_train, X_test, y_train, y_test
 
-    def getRandomData(self, split, tweetSet):
-        train, test = [], []
-        tweetsUsed = {}
-        seed(datetime.datetime.now().second)
+    def getSplitDataDL(self, testSize):
+        X_train, X_test, y_train, y_test = self.getRandomSplitData(testSize)
 
-        while len(train) < split/100*len(tweetSet):
-            value = randint(0, len(tweetSet) -1)
-            if value not in tweetsUsed:
-                tweetsUsed[value] = True
-                train.append(tweetSet[value])
+        x_train, x_test = [t.getText() for t in X_train], [t.getText() for t in X_test]
 
-        for i in range(len(tweetSet)):
-            if i not in tweetsUsed:
-                test.append(tweetSet[i])
-
-        return train, test 
+        return x_train, x_test, y_train, y_test
 
 def readFile(fileName, tPos):
     tweets = []
@@ -63,12 +56,16 @@ def readFile(fileName, tPos):
                     tweets.append(Tweet(row[tPos]))
     return tweets
 
+"""
+Main for testing purposes
+
+"""
 if __name__ == "__main__":
+    print("Running dataparser.py main")
 
     electionTweets = "./data/2016_US_election_tweets_100k.csv"
-
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     tweets = Data(electionTweets, electionTrolls)
-
-    print(tweets.getRandomizedSplitData())
+    tweets.getSplitDataDL(.7)
+    #print(tweets.getRandomizedSplitData())

@@ -10,8 +10,7 @@ Vectorizer:
 class Vectorizer():
 
     def __init__(self, data):
-        self.realTrain, self.trollTrain, self.realTest, self.trollTest = data.getRandomizedSplitData()
-
+        self.data = data
         self.tweets = data.getAllTweets()
 
     """
@@ -42,7 +41,6 @@ class Vectorizer():
     """
     def genNgram(self, n):
         return self.genGram(n)
-
 
     """
     generateNCharNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
@@ -77,7 +75,6 @@ class Vectorizer():
 
         return ngram_dict, grams
 
-
     """
     getContentMatrix(): Returns the feature matrix for content features
     Input: cols : Integer, the number of columns in the feature matrix
@@ -85,12 +82,13 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, cols)
     """
     def getContentMatrix(self, n, tweetSet):
+        print("get content matrix")
         self.generateNgramID(n, False)
 
         fm = np.zeros((len(self.tweets), len(self.ngrams) + 8))
         temp_col = len(self.ngrams)
 
-        for i in range(len(self.tweets)):
+        for i in range(len(tweetSet)):
 
             ft = self.tweets[i]
             tweetNgram = ft.getNgram(n)
@@ -103,6 +101,7 @@ class Vectorizer():
             fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
             fm[i][temp_col + 7] = ft.getNumTokens()
 
+        print("Made the matrix and returning")
         return fm
 
 
@@ -113,12 +112,14 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, cols)
     """
     def getStylisticMatrix(self, n, tweetSet):
+        print("Making stylistic matrix")
+
         self.generateNgramID(n, True)
         fm = np.zeros( (len(self.tweets), len(self.ngrams) + 34))
 
         temp_col = len(self.ngrams)
 
-        for i in range(len(tweetSet)):
+        for i in range(len(tweetSet[:30])):
             t = tweetSet[i]
             tweetCharGram = t.getCharNgram(n)
 
@@ -142,6 +143,7 @@ class Vectorizer():
 
                 idx += 1
 
+        print("Made matrix and returning")
         return fm
 
     """
@@ -151,30 +153,32 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
     def getMergedMatrix(self, tweetSet, n):
-        fm = self.getContentMatrix(n, tweetSet)
-        fv = self.getStylisticMatrix(n, tweetSet)
-        return np.concatenate((fm,fv), 1)
+        print("getting merged matrices")
+        cm = self.getContentMatrix(n, tweetSet)
+        sm = self.getStylisticMatrix(n, tweetSet)
+        print("Concatenating and returning")
+        return np.concatenate((fm,fv))
 
     def getSplitData(self, n):
-        R_train = self.getMergedMatrix(self.realTrain, n)
-        T_train = self.getMergedMatrix(self.trollTrain, n)
-        R_test= self.getMergedMatrix(self.realTest, n)
-        T_test = self.getMergedMatrix(self.trollTest, n)
-        return R_train, T_train, R_test, T_test
+        print("Get Split Data vectorizer")
+        X_train, X_test, y_train, y_test = self.data.getRandomSplitData(.7)
+        print("Got split data")
 
+        print("Merging matrices")
+        x_train = self.getMergedMatrix(X_train, n)
+        print("Merged train matrix")
+        x_test = self.getMergedMatrix(X_test, n)
+        return x_train, x_test, y_train, y_test
 
     def getTrendMatrix(self):
-        fm = np.zeros( (len(self.tweets), 2)
+        fm = np.zeros((len(self.tweets), 2))
         for i in range(len(self.tweets)):
             ft = Featurizer(self.tweets[i])
             fm[i][0] = ft.getLikes()
             fm[i][1] = ft.getRetweets()
 
-
-
-
 if __name__ == "__main__":
-    print("Running main")
+    print("Running Vectorizer.py main")
     electionTweets = "./data/2016_US_election_tweets_100k.csv"
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 

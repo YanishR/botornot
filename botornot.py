@@ -1,9 +1,9 @@
-from dataparserpy import Data
+from dataparser import Data
 from sklearn.svm import SVC, LinearSVC
 from sklearn import metrics
 from sklearn.multiclass import OneVsOneClassifier
 import numpy as np
-from Vectorizer.py import Vectorizer
+from Vectorizer import Vectorizer
 
 
 """
@@ -41,8 +41,8 @@ def performance(y_true, y_pred, metric="accuracy"):
     return -1
 
 def results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 0, degree = 1):
-    svc = SVC(C = hyper_param, kernel = 'linear', degree = degree, class_weight = 'balanced') \
-            if kernel_type == 0 \
+    svc = SVC(C = hyper_param, kernel = 'linear', degree = degree, class_weight = 'balanced')\
+            if kernel_type == 0\
             else SVC(C = hyper_param, kernel = 'poly', degree = degree, class_weight = 'balanced', coef0 = r)
 
     metrics = ["accuracy", "f1-score", "auroc", "precision", "sensitivity", "specificity"]
@@ -57,11 +57,14 @@ if __name__ == "__main__":
     print("Running botornot")
 
     electionTweets = "./data/2016_US_election_tweets_100k.csv"
-    electionTrolls = "./data/russian-troll-tweets/IRAhandle_tweets_1.csv"
+    electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
-    d = Data(electionTweets, electionTrolls)
-    v = Vectorizer(d.getRealTweets(), d.getTrollTweets())
+    v = Vectorizer(Data(electionTweets, electionTrolls))
 
-    X_train, Y_train, X_test, Y_test = v.getSplitData()
+    print("Made vectorizer")
+    X_train, X_test, Y_train, Y_test = v.getSplitData(3)
+
+    print("got split data")
+
     results(X_train, Y_train, X_test, Y_test)
     # results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 1, degree = 2) #Poly kernel

@@ -10,8 +10,10 @@ class TopicModel:
     def __init__(self, data):
 
         self.legit, self.fake = [], []
+
         for tweet in data.getRealTweets()[:1000]:
             self.legit.append(tweet.getText())
+
         for tweet in data.getTrollTweets()[:1000]:
             self.fake.append(tweet.getText())
 
@@ -25,7 +27,6 @@ class TopicModel:
         self.lda_tweets = LatentDirichletAllocation(n_components = 20, learning_method = 'online', random_state = 42)
 
         self.doc_top = self.lda_tweets.fit_transform(self.df_tweets)
-
 
     # given a string tweet, classifies it as either legit or fake using topic model
     def classify(self, tweet):
