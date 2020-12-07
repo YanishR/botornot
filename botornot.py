@@ -62,7 +62,7 @@ if __name__ == "__main__":
     v = Vectorizer(Data(electionTweets, electionTrolls))
 
     print("Made vectorizer")
-    X_train, X_test, Y_train, Y_test = v.getSplitData(3)
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3)
 
     print("got split data")
 

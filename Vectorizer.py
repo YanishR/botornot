@@ -82,7 +82,6 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, cols)
     """
     def getContentMatrix(self, n, tweetSet):
-        print("get content matrix")
         self.generateNgramID(n, False)
 
         fm = np.zeros((len(self.tweets), len(self.ngrams) + 8))
@@ -101,7 +100,6 @@ class Vectorizer():
             fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
             fm[i][temp_col + 7] = ft.getNumTokens()
 
-        print("Made the matrix and returning")
         return fm
 
 
@@ -112,7 +110,6 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, cols)
     """
     def getStylisticMatrix(self, n, tweetSet):
-        print("Making stylistic matrix")
 
         self.generateNgramID(n, True)
         fm = np.zeros( (len(self.tweets), len(self.ngrams) + 34))
@@ -143,7 +140,6 @@ class Vectorizer():
 
                 idx += 1
 
-        print("Made matrix and returning")
         return fm
 
     """
@@ -153,22 +149,16 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
     def getMergedMatrix(self, tweetSet, n):
-        print("getting merged matrices")
         cm = self.getContentMatrix(n, tweetSet)
         sm = self.getStylisticMatrix(n, tweetSet)
-        print("Concatenating and returning")
-        return np.concatenate((fm,fv))
+        #return np.concatenate((fm,fv))
+        return cm
 
     def getSplitData(self, n):
-        print("Get Split Data vectorizer")
         X_train, X_test, y_train, y_test = self.data.getRandomSplitData(.7)
-        print("Got split data")
-
-        print("Merging matrices")
         x_train = self.getMergedMatrix(X_train, n)
-        print("Merged train matrix")
         x_test = self.getMergedMatrix(X_test, n)
-        return x_train, x_test, y_train, y_test
+        return x_train, y_train, x_test, y_test
 
     def getTrendMatrix(self):
         fm = np.zeros((len(self.tweets), 2))
@@ -184,4 +174,4 @@ if __name__ == "__main__":
 
     d = Data(electionTweets, electionTrolls)
     f = Vectorizer(d)
-    f.getSplitData(1)
+    x_train, y_train, x_test, y_test = f.getSplitData(1)
