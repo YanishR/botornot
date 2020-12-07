@@ -32,11 +32,11 @@ def performance(y_true, y_pred, metric="accuracy"):
         return metrics.precision_score(y_true, y_pred)
 
     if metric == "sensitivity":
-        confusion_matrix = metrics.confusion_matrix(y_true, y_pred, labels=[1, -1])
+        confusion_matrix = metrics.confusion_matrix(y_true, y_pred, labels=[0, 1])
         return confusion_matrix[0][0] / (confusion_matrix[0][0] + confusion_matrix[0][1])
 
     if metric == "specificity":
-        confusion_matrix = metrics.confusion_matrix(y_true, y_pred, labels=[1, -1])
+        confusion_matrix = metrics.confusion_matrix(y_true, y_pred, labels=[0, 1])
         return confusion_matrix[1][1] / (confusion_matrix[1][0] + confusion_matrix[1][1])
     return -1
 
@@ -61,10 +61,7 @@ if __name__ == "__main__":
 
     v = Vectorizer(Data(electionTweets, electionTrolls))
 
-    print("Made vectorizer")
     X_train, Y_train, X_test, Y_test = v.getSplitData(3)
-
-    print("got split data")
 
     results(X_train, Y_train, X_test, Y_test)
     # results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 1, degree = 2) #Poly kernel

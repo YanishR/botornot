@@ -91,7 +91,8 @@ class Tweet():
              If every character at index 0 for every token is check, hashtags not spaced are not counted as multiple
     """
     def getNumTags(self):
-        if not self.hash_count and self.rate_count:
+
+        if self.hash_count is None and self.rate_count is None:
 
             self.hash_count = 0
             self.rate_count = 0
@@ -117,7 +118,7 @@ class Tweet():
     Output: Average of type float word size (character length) in a tweet (string)
     """
     def getAvgWordSize(self):
-        if not self.avgWordSize:
+        if self.avgWordSize is None:
             count = 0
             for token in self.tokens:
                 count += len(token)
@@ -131,7 +132,7 @@ class Tweet():
     Output: Float average number of punctuations in a string tweet
     """
     def getAvgNumPunct(self):
-        if not self.avgNumPunct:
+        if self.avgNumPunct is None:
             count = 0
             punct_set = set(['.',',',';',':','?','-','!',"'",'"','[',']','(', ')', '{', '}'])
             for char in self.tweet:
@@ -146,7 +147,7 @@ class Tweet():
     Output: Integer number of URLs in a given string tweet
     """
     def getNumURL(self):
-        if not self.numURL:
+        if self.numURL is None:
             #regex citation: GeeksForGeeks
             regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             url = re.findall(regex,self.tweet)
@@ -160,7 +161,7 @@ class Tweet():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getVocabSize(self):
-        if not self.vocabSize:
+        if self.vocabSize is None:
             self.vocabSize = len(set([word.lower() for word in self.tokens]))
         return self.vocabSize
 
@@ -170,7 +171,7 @@ class Tweet():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getAvgCapitalizations(self):
-        if not self.avgCaps:
+        if self.avgCaps is None:
             count = 0
             for token in self.tokens:
                 if token[0].isupper():
@@ -185,7 +186,7 @@ class Tweet():
     Discuss: Tweets need to be preprocessed so as to be word tokenized rather than split, to be done in the future
     """
     def getAvgEmojis(self):
-        if not self.avgEmojis:
+        if self.avgEmojis is None:
             count = 0
             for token in self.tokens:
                 if token in UNICODE_EMOJI:
@@ -199,7 +200,7 @@ class Tweet():
     Output: Float number of digits normalized by number of tokens in tweet
     """
     def getDigitFrequency(self):
-        if not self.digitFrequency:
+        if self.digitFrequency is None:
             count = 0
             for char in self.tweet:
                 if char.isdigit():
@@ -238,7 +239,7 @@ class Tweet():
     Output: Float length of hashtag words normalized by number of hashtags
     """
     def getAvgHashTagLength(self):
-        if not self.avgHashTagLength:
+        if self.avgHashTagLength is None:
             tagCount, sizeCount = 0, 0
             for token in self.tokens:
                 if token[0] == '#':
@@ -247,7 +248,7 @@ class Tweet():
             if tagCount != 0:
                 self.avgHashTagLength = sizeCount/tagCount
             else:
-                self.avgHasTagLength = 0
+                self.avgHashTagLength = 0
         return self.avgHashTagLength
 
 
@@ -256,7 +257,7 @@ class Tweet():
     Output: Array of frequencies for each letter, where each index corresponds to its number in the alphabet
     """
     def getLetterFrequency(self):
-        if not self.letterFreq:
+        if self.letterFreq is None:
             alphabet = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',\
                     'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',\
                     's', 't', 'u', 'v', 'w', 'x', 'y', 'z']

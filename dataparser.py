@@ -17,6 +17,7 @@ class Data:
         self.trollTweets = readFile(trollTweetsFileName, 2)
 
         m = min(len(self.realTweets), len(self.trollTweets))
+        m = 2000
 
         self.realTweets = self.realTweets[:m]
         self.trollTweets = self.trollTweets[:m]
@@ -32,8 +33,8 @@ class Data:
         return self.tweets
 
     def getRandomSplitData(self, testSize):
-        y = ['r'] * len(self.realTweets)
-        y += ['t'] * len(self.trollTweets)
+        y = [0] * len(self.realTweets)
+        y += [1] * len(self.trollTweets)
         X_train, X_test, y_train, y_test =\
                 train_test_split(self.tweets, y, test_size = testSize, shuffle=True)
 

@@ -11,7 +11,6 @@ class Vectorizer():
 
     def __init__(self, data):
         self.data = data
-        self.tweets = data.getAllTweets()
 
     """
     genGram(): Generate dictionary of ngrams or charngrams depending on
@@ -23,14 +22,19 @@ class Vectorizer():
     """
     def genGram(self, n, char=False):
         g = {}
-        for tweet in self.tweets:
+        for tweet in self.data.getAllTweets():
             gram = tweet.getNgram(n) if char==False else tweet.getCharNgram(n)
             for ngram in gram:
                 if ngram in g:
-                    g[ngram] += 1
+                    g[ngram] += gram[ngram]
                 else:
-                    g[ngram] = 1
-        return g
+                    g[ngram] = gram[ngram]
+        final_g = {}
+
+        for gram in g:
+            if g[gram] >= 5:
+                final_g[gram] = g[gram]
+        return final_g
 
     """
     genNgram(): Returns dictionary of ids for each ngram and a dictionary of ngrams
@@ -84,15 +88,16 @@ class Vectorizer():
     def getContentMatrix(self, n, tweetSet):
         self.generateNgramID(n, False)
 
-        fm = np.zeros((len(self.tweets), len(self.ngrams) + 8))
+        fm = np.zeros((len(tweetSet), len(self.ngrams) + 8))
         temp_col = len(self.ngrams)
 
         for i in range(len(tweetSet)):
 
-            ft = self.tweets[i]
+            ft = tweetSet[i]
             tweetNgram = ft.getNgram(n)
             for seq in tweetNgram:
-                fm[i][self.gd[seq]] = float(tweetNgram[seq])
+                if seq in self.gd:
+                    fm[i][self.gd[seq]] = float(tweetNgram[seq])
 
             fm[i][temp_col] = ft.getAvgEmojis()
             fm[i][temp_col + 1] = ft.getNumURL()
@@ -112,16 +117,17 @@ class Vectorizer():
     def getStylisticMatrix(self, n, tweetSet):
 
         self.generateNgramID(n, True)
-        fm = np.zeros( (len(self.tweets), len(self.ngrams) + 34))
+        fm = np.zeros( (len(tweetSet), len(self.ngrams) + 34))
 
         temp_col = len(self.ngrams)
 
-        for i in range(len(tweetSet[:30])):
+        for i in range(len(tweetSet)):
             t = tweetSet[i]
             tweetCharGram = t.getCharNgram(n)
 
             for seq in tweetCharGram:
-                fm[i][self.gd[seq]] = tweetCharGram[seq]
+                if seq in self.gd:
+                    fm[i][self.gd[seq]] = tweetCharGram[seq]
 
             fm[i][temp_col] = t.getAvgNumPunct()
             fm[i][temp_col + 1] = t.getAvgWordSize()
@@ -148,16 +154,18 @@ class Vectorizer():
            fv   : Numpy Array(float) of dimension(number of tweets, stylsitic features) of stylistic features
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
-    def getMergedMatrix(self, tweetSet, n):
+    def getMergedMatrix(self, n, tweetSet):
         cm = self.getContentMatrix(n, tweetSet)
         sm = self.getStylisticMatrix(n, tweetSet)
-        #return np.concatenate((fm,fv))
-        return cm
+        c = np.concatenate((cm, sm), 1)
+        return c 
 
     def getSplitData(self, n):
-        X_train, X_test, y_train, y_test = self.data.getRandomSplitData(.7)
-        x_train = self.getMergedMatrix(X_train, n)
-        x_test = self.getMergedMatrix(X_test, n)
+        X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)
+        x_train = self.getMergedMatrix(n, X_train)
+        x_test = self.getMergedMatrix(n, X_test)
+        y_train = np.array(Y_train)
+        y_test = np.array(Y_test)
         return x_train, y_train, x_test, y_test
 
     def getTrendMatrix(self):
@@ -174,4 +182,4 @@ if __name__ == "__main__":
 
     d = Data(electionTweets, electionTrolls)
     f = Vectorizer(d)
-    x_train, y_train, x_test, y_test = f.getSplitData(1)
+    x_train, y_train, x_test, y_test = f.getSplitData(.3)
