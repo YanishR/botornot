@@ -21,7 +21,7 @@ class Tweet():
     all attributes to None
 
     """
-    def __init__(self, tweet):
+    def __init__(self, tweet, likes = 0, retweets = 0, preprocess = 0, stop_words = 0, emoji = 0, hashtag = 0, url = 0, user = 0):
         self.tokens = tweet.split()
         self.tweet = tweet
         self.hash_count = None
@@ -36,6 +36,10 @@ class Tweet():
         self.avgEmojis = None
         self.digitFrequency = None
         self.avgHashTagLength = None
+        self.urls = None
+        if preprocess != 0:
+            self.tweet = self.preprocess(stop_words, emoji, hashtag, user, url)
+            self.tokens = self.tweet.split()
 
     def getText(self):
         return self.tweet
