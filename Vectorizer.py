@@ -103,7 +103,7 @@ class Vectorizer():
             fm[i][temp_col + 1] = ft.getNumURL()
             fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
             fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
-            fm[i][temp_col + 7] = ft.getNumTokens()
+            # fm[i][temp_col + 7] = ft.getNumTokens()
 
         return fm
 
@@ -140,7 +140,7 @@ class Vectorizer():
             letters = t.getLetterFrequency()
             idx = 0
 
-            for j in range(temp_col + 8, temp_col+33):
+            for j in range(temp_col + 8, temp_col+32):
 
                 fm[i][j] = letters[idx]
 
@@ -155,10 +155,10 @@ class Vectorizer():
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
     def getMergedMatrix(self, n, tweetSet):
-        cm = self.getContentMatrix(n, tweetSet)
-        sm = self.getStylisticMatrix(n, tweetSet)
+        cm = self.getContentMatrix(1, tweetSet)
+        sm = self.getStylisticMatrix(3, tweetSet)
         c = np.concatenate((cm, sm), 1)
-        return c 
+        return c
 
     def getSplitData(self, n):
         X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)

@@ -4,6 +4,8 @@ import numpy as np
 from nltk.tag import pos_tag
 from emoji import UNICODE_EMOJI # NOTE: pip3 install emoji
 from nltk import ngrams
+#nltk.download('stopwords') if stop words not downloaded already
+from nltk.corpus import stopwords
 
 """
 Tweet:
@@ -15,7 +17,7 @@ Tweet:
 class Tweet():
 
     """
-    __init__(): Initializes tweet and sets 
+    __init__(): Initializes tweet and sets
     all attributes to None
 
     """
@@ -47,7 +49,7 @@ class Tweet():
     """
     def getNgram(self, n):
         g = {} #Declare dictionary to return
-        
+
         # For each ngram
         for seq in ngrams(self.tokens, n):
             s = ""
@@ -264,10 +266,43 @@ class Tweet():
             self.letterFreq = [self.tweet.lower().count(alphabet[i]) for i in range(0,26)]
         return self.letterFreq
 
+
+    """
+    preprocess(): Preprocesses the tweet to replace hashtag with <hashtag>, mentions with "<user>", any URL with <URL>,
+                  and emojis with <emj>. It also removes all stop words.
+    Output: Preprocessed string tweeet
+    """
+    def preprocess(self, sw = 0, emoji = 0, hashtag = 0, user = 0, url = 0):
+        str = ""
+        self.getNumURL()
+        stop_words = set(stopwords.words('english'))
+        for token in self.tokens:
+            if hashtag == 0 and token[0] == '#':
+                str += "<hashtag> "
+            elif user == 0 and token[0] == '@':
+                str += "<user> "
+            elif url == 0 and token in self.urls:
+                str += "<url> "
+            elif emoji == 0 and token in UNICODE_EMOJI:
+                str += "<emj> "
+            elif stopwords == 0 and token in stop_words:
+                str += ""
+            else:
+                str += token + " "
+        return str.strip()
+
+
+        def getLikes(self):
+            return self.likes
+
+
+        def getRetweets(self):
+            return self.retweets
+
 if __name__ == "__main__":
 
     tweet = " aaa bb cccc dd e y zz"
-    F = Featurizer(tweet)
-    print(F.getNgram(2))
-    print(F.getCharNgram(2))
-    print(F.getLetterFrequency())
+    T = Tweet(tweet)
+    print(T.getNgram(2))
+    print(T.getCharNgram(2))
+    print(T.getLetterFrequency())

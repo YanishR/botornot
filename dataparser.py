@@ -17,7 +17,7 @@ class Data:
         self.trollTweets = readFile(trollTweetsFileName, 2)
 
         m = min(len(self.realTweets), len(self.trollTweets))
-        m = 2000
+        m = 10000
 
         self.realTweets = self.realTweets[:m]
         self.trollTweets = self.trollTweets[:m]

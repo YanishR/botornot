@@ -1,5 +1,6 @@
 from dataparser import Data
 from sklearn.svm import SVC, LinearSVC
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn import metrics
 from sklearn.multiclass import OneVsOneClassifier
 import numpy as np
@@ -62,6 +63,9 @@ if __name__ == "__main__":
     v = Vectorizer(Data(electionTweets, electionTrolls))
 
     X_train, Y_train, X_test, Y_test = v.getSplitData(3)
-
+    # sel = SelectKBest(chi2, k = len(X_train[0]))
+    # sel.fit_transform(X_train, Y_train)
+    # for score in sel.scores_:
+    #     print(score)
     results(X_train, Y_train, X_test, Y_test)
     # results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 1, degree = 2) #Poly kernel
