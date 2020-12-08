@@ -285,7 +285,7 @@ class Tweet():
                 str += "<url> "
             elif emoji == 0 and token in UNICODE_EMOJI:
                 str += "<emj> "
-            elif stopwords == 0 and token in stop_words:
+            elif sw == 0 and token in stop_words:
                 str += ""
             else:
                 str += token + " "
