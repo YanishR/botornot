@@ -61,11 +61,35 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     v = Vectorizer(Data(electionTweets, electionTrolls))
+    x_train, x_test, y_train, y_test = v.data.getRandomSplitData(.3)
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 0, x_train, x_test, y_train, y_test)
 
-    X_train, Y_train, X_test, Y_test = v.getSplitData(3)
     # sel = SelectKBest(chi2, k = len(X_train[0]))
     # sel.fit_transform(X_train, Y_train)
     # for score in sel.scores_:
     #     print(score)
-    results(X_train, Y_train, X_test, Y_test)
-    # results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel_type = 1, degree = 2) #Poly kernel
+    #results(X_train, Y_train, X_test, Y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(2, 0, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 0, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 1, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 2, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 3, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 4, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 5, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    

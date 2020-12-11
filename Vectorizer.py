@@ -85,26 +85,28 @@ class Vectorizer():
            n    : Integer, Describes n for word n grams
     Output: Numpy Array of dimension(number of tweets, cols)
     """
-    def getContentMatrix(self, n, tweetSet):
+    def getContentMatrix(self, n, tweetSet, param = 0):
         self.generateNgramID(n, False)
 
         fm = np.zeros((len(tweetSet), len(self.ngrams) + 8))
         temp_col = len(self.ngrams)
 
         for i in range(len(tweetSet)):
-
             ft = tweetSet[i]
             tweetNgram = ft.getNgram(n)
             for seq in tweetNgram:
                 if seq in self.gd:
                     fm[i][self.gd[seq]] = float(tweetNgram[seq])
-
-            fm[i][temp_col] = ft.getAvgEmojis()
-            fm[i][temp_col + 1] = ft.getNumURL()
-            fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
-            fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
-            # fm[i][temp_col + 7] = ft.getNumTokens()
-
+            if param > 0 :
+                fm[i][temp_col] = ft.getAvgEmojis()
+            if param > 1 :
+                fm[i][temp_col + 1] = ft.getNumURL()
+            if param > 2 :
+                fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
+            if param > 3:
+                fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
+            if param > 4:
+                fm[i][temp_col + 7] = ft.getNumTokens()
         return fm
 
 
@@ -114,7 +116,7 @@ class Vectorizer():
            n    : Integer, Describes n for character n grams
     Output: Numpy Array of dimension(number of tweets, cols)
     """
-    def getStylisticMatrix(self, n, tweetSet):
+    def getStylisticMatrix(self, n, tweetSet, param = 0):
 
         self.generateNgramID(n, True)
         fm = np.zeros( (len(tweetSet), len(self.ngrams) + 34))
@@ -128,23 +130,29 @@ class Vectorizer():
             for seq in tweetCharGram:
                 if seq in self.gd:
                     fm[i][self.gd[seq]] = tweetCharGram[seq]
-
-            fm[i][temp_col] = t.getAvgNumPunct()
-            fm[i][temp_col + 1] = t.getAvgWordSize()
-            fm[i][temp_col + 2] = t.getVocabSize()
-            dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = t.getPOSTaggedDistribution()
-            fm[i][temp_col + 5] = t.getDigitFrequency()
-            fm[i][temp_col + 6] = t.getAvgHashTagLength()
-            fm[i][temp_col + 7] = t.getAvgCapitalizations()
+            if param > 0 :
+                fm[i][temp_col] = t.getAvgNumPunct()
+            if param > 1 :
+                fm[i][temp_col + 1] = t.getAvgWordSize()
+            if param > 2 :
+                fm[i][temp_col + 2] = t.getVocabSize()
+            if param > 3 :
+                dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = t.getPOSTaggedDistribution()
+            if param > 4 :
+                fm[i][temp_col + 5] = t.getDigitFrequency()
+            if param > 5 :
+                fm[i][temp_col + 6] = t.getAvgHashTagLength()
+            if param > 6 :
+                fm[i][temp_col + 7] = t.getAvgCapitalizations()
 
             letters = t.getLetterFrequency()
             idx = 0
+            if param > 7:
+                for j in range(temp_col + 8, temp_col+32):
 
-            for j in range(temp_col + 8, temp_col+32):
+                    fm[i][j] = letters[idx]
 
-                fm[i][j] = letters[idx]
-
-                idx += 1
+                    idx += 1
 
         return fm
 
@@ -154,16 +162,16 @@ class Vectorizer():
            fv   : Numpy Array(float) of dimension(number of tweets, stylsitic features) of stylistic features
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
-    def getMergedMatrix(self, n, tweetSet):
-        cm = self.getContentMatrix(1, tweetSet)
-        sm = self.getStylisticMatrix(3, tweetSet)
+    def getMergedMatrix(self, n, tweetSet, param):
+        cm = self.getContentMatrix(1, tweetSet, 10)
+        sm = self.getStylisticMatrix(3, tweetSet, 10)
         c = np.concatenate((cm, sm), 1)
         return c
 
-    def getSplitData(self, n):
-        X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)
-        x_train = self.getMergedMatrix(n, X_train)
-        x_test = self.getMergedMatrix(n, X_test)
+    def getSplitData(self, n, param, X_train, X_test, Y_train, Y_test):
+        # X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)
+        x_train = self.getContentMatrix(n, X_train, param)
+        x_test = self.getContentMatrix(n, X_test, param)
         y_train = np.array(Y_train)
         y_test = np.array(Y_test)
         return x_train, y_train, x_test, y_test
