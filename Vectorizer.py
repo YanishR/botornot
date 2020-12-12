@@ -167,10 +167,10 @@ class Vectorizer():
     """
 
     def getMergedMatrix(self, n, tweetSet, param):
-        #cm = self.getContentMatrix(n, tweetSet, 10)
+        cm = self.getContentMatrix(n, tweetSet, 10)
         sm = self.getStylisticMatrix(n, tweetSet, 10)
-        #c = np.concatenate((cm, sm), 1)
-        return sm
+        c = np.concatenate((cm, sm), 1)
+        return c
 
     def getSplitData(self, n, param, X_train, X_test, Y_train, Y_test):
         # X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)
