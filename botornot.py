@@ -48,6 +48,7 @@ def results(X_train, Y_train, X_test, Y_test, r = 0.1, hyper_param = 0.1, kernel
 
     metrics = ["accuracy", "f1-score", "auroc", "precision", "sensitivity", "specificity"]
 
+
     for metric in metrics:
         svc.fit(X_train, Y_train)
         Y_predicted = svc.predict(X_test) if metric != "auroc" else svc.decision_function(X_test)
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
     v = Vectorizer(Data(electionTweets, electionTrolls))
     x_train, x_test, y_train, y_test = v.data.getRandomSplitData(.3)
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 0, x_train, x_test, y_train, y_test)
+    X_train, Y_train, X_test, Y_test = v.getSplitData(4, 7, x_train, x_test, y_train, y_test)
 
     # sel = SelectKBest(chi2, k = len(X_train[0]))
     # sel.fit_transform(X_train, Y_train)
@@ -70,26 +71,49 @@ if __name__ == "__main__":
     #     print(score)
     #results(X_train, Y_train, X_test, Y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(2, 0, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+
+    print("K best features":)
+    v.getKBestFeatures(X_train, Y_train)
+
+    print("K best features")
+    X_new = SelectKBest(chi2, k=100).fit(X_train, Y_train)
+    s = {}
+    for i in range(len(X_new.scores_)):
+        if not np.isnan(X_new.scores_[i]):
+            s[X_new.scores_[i]] = i
+
+    bestScores = sorted(s.items(), reverse=True)[:100]
+    for s in bestScores:
+        print(s[1])
+    """
+    X_train, Y_train, X_test, Y_test = v.getSplitData(4, 0, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 0, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(5, 0, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 1, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 1, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 2, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 2, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 3, x_train, x_test, y_train, y_test)
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 3, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 4, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 4, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    X_train, Y_train, X_test, Y_test = v.getSplitData(1, 5, x_train, x_test, y_train, y_test)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 5, x_train, x_test, y_train, y_test)
     results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 6, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('-----------------------------------------------------------------------------------------')
     
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 7, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    print('-----------------------------------------------------------------------------------------')
+    X_train, Y_train, X_test, Y_test = v.getSplitData(3, 8, x_train, x_test, y_train, y_test)
+    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    """

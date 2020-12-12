@@ -21,7 +21,8 @@ class Vectorizer():
     Output: dict g: dictionary of ngrams or char ngrams and their occurences
     """
     def genGram(self, n, char=False):
-        g = {}
+        g = {} # Declare dictionary
+
         for tweet in self.data.getAllTweets():
             gram = tweet.getNgram(n) if char==False else tweet.getCharNgram(n)
             for ngram in gram:
@@ -118,11 +119,13 @@ class Vectorizer():
     """
     def getStylisticMatrix(self, n, tweetSet, param = 0):
 
-        self.generateNgramID(n, True)
-        fm = np.zeros( (len(tweetSet), len(self.ngrams) + 34))
+        self.generateNgramID(n, True) # Generate ngram ids
+        fm = np.zeros( (len(tweetSet), len(self.ngrams) + 34)) # make np array
 
-        temp_col = len(self.ngrams)
+        temp_col = len(self.ngrams) # Keep track of temp_col
 
+        # For each tweet
+        # Fill in the matrix accordingly
         for i in range(len(tweetSet)):
             t = tweetSet[i]
             tweetCharGram = t.getCharNgram(n)
@@ -162,16 +165,17 @@ class Vectorizer():
            fv   : Numpy Array(float) of dimension(number of tweets, stylsitic features) of stylistic features
     Output: Numpy Array of dimension(number of tweets, content features + stylsitic features)
     """
+
     def getMergedMatrix(self, n, tweetSet, param):
-        cm = self.getContentMatrix(1, tweetSet, 10)
-        sm = self.getStylisticMatrix(3, tweetSet, 10)
-        c = np.concatenate((cm, sm), 1)
-        return c
+        #cm = self.getContentMatrix(n, tweetSet, 10)
+        sm = self.getStylisticMatrix(n, tweetSet, 10)
+        #c = np.concatenate((cm, sm), 1)
+        return sm
 
     def getSplitData(self, n, param, X_train, X_test, Y_train, Y_test):
         # X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(.3)
-        x_train = self.getContentMatrix(n, X_train, param)
-        x_test = self.getContentMatrix(n, X_test, param)
+        x_train = self.getMergedMatrix(n, X_train, param)
+        x_test = self.getMergedMatrix(n, X_test, param)
         y_train = np.array(Y_train)
         y_test = np.array(Y_test)
         return x_train, y_train, x_test, y_test
