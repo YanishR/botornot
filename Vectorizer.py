@@ -167,8 +167,8 @@ class Vectorizer():
     """
 
     def getMergedMatrix(self, n, tweetSet, param):
-        cm = self.getContentMatrix(n, tweetSet, 10)
-        sm = self.getStylisticMatrix(n, tweetSet, 10)
+        cm = self.getContentMatrix(1, tweetSet, 10)
+        sm = self.getStylisticMatrix(3, tweetSet, 10)
         c = np.concatenate((cm, sm), 1)
         return c
 

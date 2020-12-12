@@ -73,7 +73,7 @@ if __name__ == "__main__":
     # Add best scores to s
     for i in range(len(X_new.scores_)):
         if not np.isnan(X_new.scores_[i]):
-            s[X_new.scores_[i]] = i
+            scores[X_new.scores_[i]] = i
 
     # Create list for features
     features = []
@@ -90,7 +90,11 @@ if __name__ == "__main__":
             features.append(s[1] - len(v.gd))
     print(features)
 
-    results(X_train, Y_train, X_test, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
+    kBest = SelectKBest(chi2, k=100).fit(X_train, Y_train)
+    X_train_new = kBest.transform(X_train)
+    X_test_new = kBest.transform(X_test)
+
+    results(X_train_new, Y_train, X_test_new, Y_test, r = 10, hyper_param = 1, kernel_type = 1, degree = 2)
     print('-----------------------------------------------------------------------------------------')
 
     """
