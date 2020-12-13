@@ -7,30 +7,22 @@ from tweet import Tweet
 # Get split method
 from sklearn.model_selection import train_test_split
 
-# To split data randomly
-from random import seed
-from random import randint
-
-# Datetime for randomness
-import datetime
-
 class Data:
 
     # Init method
-    def __init__(self, realTweetsFileName, trollTweetsFileName):
+    def __init__(self, realTweetsFileName, trollTweetsFileName, realTweetSize=5000, trollTweetSize=1000):
         # Read in real tweets and troll tweets from given files
         # 11, 2 denote the index of text in csv
         self.realTweets = readFile(realTweetsFileName, 11)
         self.trollTweets = readFile(trollTweetsFileName, 2)
 
-        # Get the minimum of both lengths
-        # to split data evenly
-        m = min(len(self.realTweets), len(self.trollTweets))
-        m = 5000
+        # Get size of tweet sets
+        realSize = realTweetSize if 0 < realTweetSize < len(self.realTweets) else len(self.realTweets)
+        trollSize = trollTweetSize if 0 < trollTweetSize < len(self.trollTweets) else len(self.trollTweets)
 
         # Reduce data sizes
-        self.realTweets = self.realTweets[:m]
-        self.trollTweets = self.trollTweets[:int(m/5)]
+        self.realTweets = self.realTweets[:realSize]
+        self.trollTweets = self.trollTweets[:trollSize]
         self.tweets = self.realTweets + self.trollTweets
 
     # Get All real tweets
