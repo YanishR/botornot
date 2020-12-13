@@ -13,7 +13,7 @@ if __name__ == "__main__":
     
     accs = []
     for i in range(0, 500, 100):
-        p = v.runKBestFeatures(i, 3, content=True)
+        f, p = v.runKBestFeatures(i, 3, content=True)
 
         accs.append(p["accuracy"])
     print(accs)
