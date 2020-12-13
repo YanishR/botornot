@@ -222,8 +222,8 @@ class Vectorizer():
         # Same here
         smTr, smTe = None, None
         if 'stylistic' in matrices:
-            smTr = self.getContentMatrix(X_train, matrices['stylistic'][0], matrices['stylistic'][1])
-            smTe = self.getContentMatrix(X_test, matrices['stylistic'][0], matrices['stylistic'][1])
+            smTr = self.getStylisticMatrix(X_train, matrices['stylistic'][0], matrices['stylistic'][1])
+            smTe = self.getStylisticMatrix(X_test, matrices['stylistic'][0], matrices['stylistic'][1])
 
         # If both we want them to be merged
         x_train, x_test = None, None
@@ -308,7 +308,7 @@ class Vectorizer():
     def getStylisticMatrix(self, tweetSet, n, features=[]):
 
         ids = self.generateNgramID(n, True) # Generate ngram ids
-        fm = np.zeros((len(tweetSet), len(self.ngrams) + 34)) # make np array
+        fm = np.zeros((len(tweetSet), len(ids) + 34)) # make np array
 
         temp_col = len(ids) # Keep track of temp_col
 
@@ -319,8 +319,8 @@ class Vectorizer():
             tweetCharGram = t.getCharNgram(n)
 
             for seq in tweetCharGram:
-                if seq in self.gd:
-                    fm[i][self.gd[seq]] = tweetCharGram[seq]
+                if seq in ids:
+                    fm[i][ids[seq]] = tweetCharGram[seq]
 
             # For each feature in features
             # add the feature to the matrix if desired

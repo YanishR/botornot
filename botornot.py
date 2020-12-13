@@ -9,11 +9,14 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     v = Vectorizer(electionTweets, electionTrolls)
-    v.runSVM()
     
+    #v.runSVM()
     accs = []
     for i in range(0, 500, 100):
-        f, p = v.runKBestFeatures(i, 3, content=True)
+        # first number is k, second is n fro gram
+        # content is whether we want content matrix
+        # or not(stylistic)
+        f, p = v.runKBestFeatures(i, 3, content=False)
 
         accs.append(p["accuracy"])
-    print(accs)
+    #print(accs)
