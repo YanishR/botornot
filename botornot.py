@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # stylistic matrix contains all features (1 to 7)
     # n for char n-gram:3
     f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
-            #stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
+            stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
     
     """
@@ -36,9 +36,8 @@ if __name__ == "__main__":
         f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
                 stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
-        # Print features if desired
+        #Print features if desired
 
         #for feature in f:
             #print(feature)
     """
-
