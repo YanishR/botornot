@@ -1,6 +1,10 @@
 from dataparser import Data
 from Vectorizer import Vectorizer
+
 from topic_model import TopicModel
+
+from RNN import RNN
+
 
 if __name__ == "__main__":
     print("Running botornot")
@@ -10,6 +14,8 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     v = Vectorizer(electionTweets, electionTrolls)
+
+    myRNN = RNN(electionTweets, electionTrolls)
 
     # Run SVM with default features
     # Features such as content matrix and kernel type
@@ -43,6 +49,7 @@ if __name__ == "__main__":
             #print(feature)
     """
 
+
     """
     Uncomment for LDA based classification
 
@@ -59,3 +66,7 @@ if __name__ == "__main__":
 
     print(classification_report(y_test, y_pred))
     """
+
+    # Run LSTM experiments
+    # A summary of the Model and Results will be printed if the following line is uncommented
+    # myRNN.run()

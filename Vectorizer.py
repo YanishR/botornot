@@ -69,10 +69,12 @@ class Vectorizer():
         print("---------------------------------------")
         if kernel_type == 0:
             print("\tLinear kernel with: ")
+
             print("\t\thyper parameter: " + str(hyper_param))
         else:
             print("\tQuadratic kernel with: ")
             print("\t\tr: " + str(r) + ", hyper parameter: " + str(hyper_param))
+
 
         print("\tContent Matrix: " + str(contentMatrix))
         if contentMatrix:
@@ -189,7 +191,7 @@ class Vectorizer():
         print("---------------------------------------")
         print("\tLinear kernel with: ")
 
-        print("\t\tr: " + str(1) + ", hyper parameter: " + str(0.1))
+        print("\t\thyper parameter: " + str(0.1))
 
         print("\tWith: ")
         if contentMatrix:
