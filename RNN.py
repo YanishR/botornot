@@ -138,15 +138,3 @@ if __name__ == "__main__":
     myRNN.trainLSTM()
     scores = myRNN.evaluate(test_data, y_test)
     print(scores)
-
-
-
-
-
-
-
-
-
-
-
-

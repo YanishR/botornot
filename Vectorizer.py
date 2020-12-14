@@ -49,58 +49,46 @@ class Vectorizer():
             stylisticMatrix=True, stylisticMatrixFeatures=[], charN=3, testSize=.3,\
             r=1, hyper_param=0.1, kernel_type=0, degree=1):
         
-        matrices = {} # Dictionary to pass information to getSplitData
+        m = {} # Dictionary to pass information to getSplitData
 
         # If content matrix, build appropriate data
         if contentMatrix:
-            matrices['content'] = [wordN, contentMatrixFeatures]
+            m['content'] = [wordN, contentMatrixFeatures]
 
         # Same for stylistic
         if stylisticMatrix:
-            matrices['stylistic'] = [charN, stylisticMatrixFeatures]
+            m['stylistic'] = [charN, stylisticMatrixFeatures]
 
         # Get split data with matrices and desired test size
-        X_train, Y_train, X_test, Y_test = self.getSplitData(matrices, testSize)
+        X_train, Y_train, X_test, Y_test, d1, d2 = self.getSplitData(m, testSize)
 
-        # Declare SVC classifier
-        svc = SVC(C = hyper_param, kernel = 'linear', degree = degree, class_weight = 'balanced')\
-            if kernel_type == 0\
-            else SVC(C = hyper_param, kernel = 'poly', degree = degree, class_weight = 'balanced', coef0 = r)
-
-        # Fit the data
-        svc.fit(X_train, Y_train)
-        # And obtain Y_predicted
-        Y_predicted = svc.predict(X_test)
-        # Has to be done for auroc
-        Y_predicted_auroc = svc.decision_function(X_test)
-        # Get performance metrics
-        performance = self.getPerformance(Y_test, Y_predicted, Y_predicted_auroc)
+        performance = self.runSVC(X_train, Y_train, X_test, Y_test, r, hyper_param, kernel_type, degree)
 
         # Print results
-        print("Performing experiment")
+        print("Performing SVM:")
         print("---------------------------------------")
         if kernel_type == 0:
-            print("Linear kernel with: ")
+            print("\tLinear kernel with: ")
         else:
-            print("Quadratic kernel with: ")
+            print("\tQuadratic kernel with: ")
 
-        print("r: " + str(r) + ", hyper parameter: " + str(hyper_param))
+        print("\t\tr: " + str(r) + ", hyper parameter: " + str(hyper_param))
 
-        print("Content Matrix: " + str(contentMatrix))
+        print("\tContent Matrix: " + str(contentMatrix))
         if contentMatrix:
-            print("Word ngram n: " + str(wordN))
-            print("Content Matrix Features: " + str(contentMatrixFeatures))
+            print("\t\tWord ngram n: " + str(wordN))
+            print("\t\tContent Matrix Features: " + str(contentMatrixFeatures))
 
-        print("Stylistic Matrix: " + str(stylisticMatrix))
+        print("\tStylistic Matrix: " + str(stylisticMatrix))
         if stylisticMatrix:
-            print("Char ngram n: " + str(charN))
-            print("Stylistic Matrix Features" + str(stylisticMatrixFeatures))
+            print("\t\tChar ngram n: " + str(charN))
+            print("\tStylistic Matrix Features" + str(stylisticMatrixFeatures))
 
-        print("test set size: " + str(testSize))
+        print("\ttest set size: " + str(testSize))
         print("-----------------------------------------")
-        print("Performance")
+        print("\tPerformance")
         for metric in performance:
-            print(metric + " : " + str(performance[metric]))
+            print("\t\t" + metric + " : " + str(performance[metric]))
 
         return performance
     
@@ -115,43 +103,77 @@ class Vectorizer():
     Output: features: list of k best features
             performance: dictionary of performance metrics
     """
-    def runKBestFeatures(self, k, n, content=True, features=[], kernel_type=0, r=1,degree=1, hyper_param=1):
-
-        # Build matrix for info
-        m = {}
+    def runKBestFeatures(self, k, contentMatrix=True, contentMatrixFeatures=[], wordN=1,\
+            stylisticMatrix=True, stylisticMatrixFeatures=[],charN=3, testSize=.3):
         
-        if content:
-            m['content'] = [n, features]
-        else:
-            m['stylistic'] = [n, features]
+        m = {} # Dictionary to pass information to getSplitData
+
+        # If content matrix, build appropriate data
+        if contentMatrix:
+            m['content'] = [wordN, contentMatrixFeatures]
+
+        # Same for stylistic
+        if stylisticMatrix:
+            m['stylistic'] = [charN, stylisticMatrixFeatures]
 
         # Get split data from m
-        X_train, Y_train, X_test, Y_test = self.getSplitData(m)
+        X_train, Y_train, X_test, Y_test, cmFS, smFS  = self.getSplitData(m, testSize)
 
         # Find best k features
         X_new = SelectKBest(chi2, k=k).fit(X_train, Y_train) # Get the best scores
         
         # Create dictionary to search through
         scores = {}         # Add best scores to s
+
         for i in range(len(X_new.scores_)):
             if not np.isnan(X_new.scores_[i]):
                 scores[X_new.scores_[i]] = i
 
         # Create list for best k features
         features = []
-        ids = self.generateNgramID(n) if content else self.generateNgramID(n, True)
+        ids = None
+        smStart = 0
+        if contentMatrix:
+            ids = self.generateNgramID(wordN)
 
-        # Get top k features from s
-        for s in sorted(scores.items(), reverse=True)[:k]:
-            # boolean to see if it is an ngram
-            found = False
-            for seq in ids:
-                if s[1] == ids[seq]:
-                    features.append(seq)
-                    found = True
-            # If not found among ngrams
-            if found == False:
-                features.append(s[1] - len(ids))
+            # Get top k features from s
+            for s in sorted(scores.items(), reverse=True)[:k]:
+                # boolean to see if it is an ngram
+                found = False
+                for seq in ids:
+                    if s[1] == ids[seq]:
+                        features.append(seq)
+                        found = True
+                # If not found among ngrams
+                if found == False:
+                    cmf = len(contentMatrixFeatures)
+                    if  3 in contentMatrixFeatures:
+                        cmf +=2
+                    if cmFS < s[1] < cmFS + cmf :
+                        features.append("content: " + str(s[1] - cmFS))
+
+            smStart = len(ids) + cmFS
+        
+        if stylisticMatrix:
+            ids = self.generateNgramID(charN, True)
+            # Get top k features from s
+            for s in sorted(scores.items(), reverse=True)[:k]:
+                # boolean to see if it is an ngram
+                found = False
+                for seq in ids:
+                    if s[1] == ids[seq]:
+                        features.append(seq)
+                        found = True
+
+                # If not found among ngrams
+                if found == False:
+                    if smStart + smFS < s[1]:
+                        smf = len(stylisticMatrixFeatures)
+                        if 3 in stylistixMatrixFeatures:
+                            smf += 2
+                        if 7 in stylisticMatrixFeatures:
+                            smf += 2
+                        features.append("stylistic: " + str((s[1] + smStart + smFS )))
 
         # Fit with traning data
         kBest = SelectKBest(chi2, k=100).fit(X_train, Y_train)
@@ -160,45 +182,55 @@ class Vectorizer():
         X_train_new = kBest.transform(X_train)
         X_test_new = kBest.transform(X_test)
 
-        # Declare SVC
-        svc = SVC(C = hyper_param, kernel = 'linear', degree = 1, class_weight = 'balanced')\
-            if kernel_type == 0\
-            else SVC(C = hyper_param, kernel = 'poly', degree = 2, class_weight = 'balanced', coef0 = r)
-
-        # Fit data
-        svc.fit(X_train_new, Y_train)
-        Y_predicted = svc.predict(X_test_new)
-        Y_predicted_auroc = svc.decision_function(X_test_new)
-        performance = self.getPerformance(Y_test, Y_predicted, Y_predicted_auroc)
+        performance = self.runSVC(X_train_new, Y_train, X_test_new, Y_test)
 
         # Print results
-        print("Performing experiment")
+        print("Performing K best features")
         print("---------------------------------------")
-        if kernel_type == 0:
-            print("Linear kernel with: ")
-        else:
-            print("Quadratic kernel with: ")
+        print("\tLinear kernel with: ")
 
-        print("r: " + str(r) + ", hyper parameter: " + str(hyper_param))
+        print("\t\tr: " + str(1) + ", hyper parameter: " + str(0.1))
 
-        print("Content Matrix: " + str(content))
-        if content:
-            print("Word ngram n: " + str(n))
-            print("Content Matrix Features: " + str(features))
+        print("\tWith: ")
+        if contentMatrix:
+            print("\t\tContent Matrix: " + str(contentMatrix))
+            print("\t\t\tWord ngram n: " + str(wordN))
+            print("\t\t\tContent Matrix Features: " + str(contentMatrixFeatures))
+        if stylisticMatrix:
+            print("\t\tStylistic Matrix: " + str(stylisticMatrix))
+            print("\t\t\tChar ngram n: " + str(charN))
+            print("\t\t\tStylistic Matrix Features" + str(stylisticMatrixFeatures))
 
-        print("Stylistic Matrix: " + str(content==False))
-        if content==False:
-            print("Char ngram n: " + str(n))
-            print("Stylistic Matrix Features" + str(features))
-
-        print("test set size: " + str(.3))
+        print("\ttest set size: " + str(.3))
         print("-----------------------------------------")
-        print("Performance")
+        print("\tPerformance")
         for metric in performance:
-            print(metric + " : " + str(performance[metric]))
+            print("\t\t" + metric + " : " + str(performance[metric]))
         print("-----------------------------------------")
 
         return features, performance 
+
+    """
+    runSVC(): Returns performance results from SVC classifier
+    for matrices
+    Input:  X_train, Y_train, X_test, Y_test: sets of vectors of features and labels
+            r, hyper_param, kernel_type, degree: attributes to run svc classifier
+    Output: X_train, Y_train, X_test, Y_test 
+    """
+    def runSVC(self, X_train, Y_train, X_test, Y_test,\
+            r=1, hyper_param=0.1, kernel_type=0, degree=1):
+
+        # Declare SVC
+        svc = SVC(C = hyper_param, kernel = 'linear', degree = degree, class_weight = 'balanced')\
+            if kernel_type == 0\
+            else SVC(C = hyper_param, kernel = 'poly', degree = degree, class_weight = 'balanced', coef0 = r)
+
+        # Fit data
+        svc.fit(X_train, Y_train)
+        Y_predicted = svc.predict(X_test)
+        Y_predicted_auroc = svc.decision_function(X_test)
+
+        return self.getPerformance(Y_test, Y_predicted, Y_predicted_auroc)
 
     """
     getSplitData(): Returns split data given dictionary of desired features
@@ -216,14 +248,14 @@ class Vectorizer():
         cmTr, cmTe = None, None
 
         if 'content' in matrices:
-            cmTr = self.getContentMatrix(X_train, matrices['content'][0], matrices['content'][1])
-            cmTe = self.getContentMatrix(X_test, matrices['content'][0], matrices['content'][1])
+            cmTr, cmFS = self.getContentMatrix(X_train, matrices['content'][0], matrices['content'][1])
+            cmTe, dummy = self.getContentMatrix(X_test, matrices['content'][0], matrices['content'][1])
 
         # Same here
         smTr, smTe = None, None
         if 'stylistic' in matrices:
-            smTr = self.getStylisticMatrix(X_train, matrices['stylistic'][0], matrices['stylistic'][1])
-            smTe = self.getStylisticMatrix(X_test, matrices['stylistic'][0], matrices['stylistic'][1])
+            smTr, smFS =  self.getStylisticMatrix(X_train, matrices['stylistic'][0], matrices['stylistic'][1])
+            smTe, dummy= self.getStylisticMatrix(X_test, matrices['stylistic'][0], matrices['stylistic'][1])
 
         # If both we want them to be merged
         x_train, x_test = None, None
@@ -241,7 +273,7 @@ class Vectorizer():
         y_test = np.array(Y_test)
 
         # Return
-        return x_train, y_train, x_test, y_test
+        return x_train, y_train, x_test, y_test, cmFS, smFS
 
     """
     getPerformance: given, y_true, y_pred and y_pred auroc, return performance metrics
@@ -270,10 +302,17 @@ class Vectorizer():
         # Generate n gram ids
         ids = self.generateNgramID(n)
 
+        
+        cols = len(ids) + len(features) + 1
+        if 3 in features:
+            cols += 2
+
         # Declare np array of zeros
-        fm = np.zeros((len(tweetSet), len(ids) + 8))
-        # last column of word n grams is len(ids)
-        temp_col = len(ids)
+        fm = np.zeros((len(tweetSet), cols))
+
+        # feature column start
+        # The index where the features other than word n grams
+        fCS = len(ids)
 
         # for each tweet
         # build the feature row
@@ -288,16 +327,17 @@ class Vectorizer():
             # For each feature in features,
             # add the feature to the matrix if desired
             if 0 in features:
-                fm[i][temp_col] = ft.getAvgEmojis()
+                fm[i][fCS] = t.getAvgEmojis()
             if 1 in features:
-                fm[i][temp_col + 1] = ft.getNumURL()
+                fm[i][fCS] = t.getNumURL()
             if 2 in features:
-                fm[i][temp_col + 2], fm[i][temp_col + 3] = ft.getNumTags()
+                fm[i][fCS], fm[i][fCS + 3] = t.getNumTags()
             if 3 in features:
-                fm[i][temp_col + 4], fm[i][temp_col + 5], fm[i][temp_col + 6], dummy, dummy2 = ft.getPOSTaggedDistribution()
+                fm[i][fCS+ 4], fm[i][fCS + 5], fm[i][fCS + 6], dummy, dummy2 = t.getPOSTaggedDistribution()
             if 4 in features:
-                fm[i][temp_col + 7] = ft.getNumTokens()
-        return fm
+                fm[i][fCS + 7] = t.getNumTokens()
+
+        return fm, fCS 
 
     """
     getStylisticMatrix(): Returns the feature matrix for stylistic features
@@ -308,9 +348,17 @@ class Vectorizer():
     def getStylisticMatrix(self, tweetSet, n, features=[]):
 
         ids = self.generateNgramID(n, True) # Generate ngram ids
-        fm = np.zeros((len(tweetSet), len(ids) + 34)) # make np array
 
-        temp_col = len(ids) # Keep track of temp_col
+        cols = len(ids) + len(features)
+        if 3 in features:
+            cols += 1
+
+        if 7 in features:
+            cols += 26
+
+        fm = np.zeros((len(tweetSet), cols)) # make np array
+
+        fCS = len(ids) # Keep track of temp_col
 
         # For each tweet
         # Fill in the matrix accordingly
@@ -325,28 +373,28 @@ class Vectorizer():
             # For each feature in features
             # add the feature to the matrix if desired
             if 0 in features:
-                fm[i][temp_col] = t.getAvgNumPunct()
-            if 1 in features :
-                fm[i][temp_col + 1] = t.getAvgWordSize()
+                fm[i][fCS] = t.getAvgNumPunct()
+            if 1 in features:
+                fm[i][fCS] = t.getAvgWordSize()
             if 2 in features:
-                fm[i][temp_col + 2] = t.getVocabSize()
-            if 3 in features :
-                dummy, dummy1, dummy2, fm[i][temp_col + 3], fm[i][temp_col + 4] = t.getPOSTaggedDistribution()
+                fm[i][fCS] = t.getVocabSize()
+            if 3 in features:
+                dummy, dummy1, dummy2, fm[i][fCS + 3], fm[i][fCS + 4] = t.getPOSTaggedDistribution()
             if 4 in features:
-                fm[i][temp_col + 5] = t.getDigitFrequency()
+                fm[i][fCS+ 5] = t.getDigitFrequency()
             if 5 in features:
-                fm[i][temp_col + 6] = t.getAvgHashTagLength()
+                fm[i][fCS + 6] = t.getAvgHashTagLength()
             if 6 in features :
-                fm[i][temp_col + 7] = t.getAvgCapitalizations()
+                fm[i][fCS+ 7] = t.getAvgCapitalizations()
 
             # add letter frequency in this case
             if 7 in features:
                 letters = t.getLetterFrequency()
                 idx = 0
-                for j in range(temp_col + 8, temp_col+34):
+                for j in range(fCS+ 8, fCS+34):
                     fm[i][j] = letters[idx]
                     idx += 1
-        return fm
+        return fm, fCS
 
     """
     genGram(): Generate dictionary of ngrams or charngrams depending on
@@ -410,7 +458,6 @@ class Vectorizer():
                 ngram_dict[seq] = ind
                 ind += 1
 
-    
         return ngram_dict
 
 # For testing purposes
