@@ -28,11 +28,17 @@ if __name__ == "__main__":
             #stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
     
+    """
+    Uncomment for k best merged matrix
+    
     for i in [100, 500, 1000]:
         print("k = " +  str(i))
         f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
                 stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
-        for feature in f:
-            print(feature)
+        # Print features if desired
+
+        #for feature in f:
+            #print(feature)
+    """
 
