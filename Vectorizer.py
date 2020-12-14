@@ -15,21 +15,21 @@ Vectorizer:
     Class that takes in data of real tweets and troll tweets,
     transforms the data into useful feature matrices,
     and runs experiments:
-    - SVM with different parameter 
+    - SVM with different parameter
     - k best features with different parameters
 """
 class Vectorizer():
     """
     __init__(): Initializes our vectorizer with a real tweet and troll tweet file
     Input:  realTweetFile: specifying path of real tweets
-            trollTweetFile: self explanatory 
+            trollTweetFile: self explanatory
             realTweetSize: self explanatory
             trollTweetSize: self explanatory
     """
 
     def __init__(self, realTweetFile, trollTweetFile, realTweetSize=5000, trollTweetSize=1000):
         self.data = Data(realTweetFile, trollTweetFile, realTweetSize, trollTweetSize)
-    
+
     """
     runSVM(): Performs SVM classification and prints results
     Input:  contentMatrix: Boolean of whether we want the content matrix as features
@@ -39,7 +39,7 @@ class Vectorizer():
             stylisticMatrixFeatures: As before
             charN: As before
             testSize: How big we want our test set compare to entire data set
-            r: r for svc 
+            r: r for svc
             hyper_param: for svc
             kernel_type: 0 is linear, 1 is poly
             degree: degree of function
@@ -48,7 +48,7 @@ class Vectorizer():
     def runSVM(self, contentMatrix=True, contentMatrixFeatures=[], wordN=1,\
             stylisticMatrix=True, stylisticMatrixFeatures=[], charN=3, testSize=.3,\
             r=1, hyper_param=0.1, kernel_type=0, degree=1):
-        
+
         m = {} # Dictionary to pass information to getSplitData
 
         # If content matrix, build appropriate data
@@ -69,10 +69,10 @@ class Vectorizer():
         print("---------------------------------------")
         if kernel_type == 0:
             print("\tLinear kernel with: ")
+            print("\t\thyper parameter: " + str(hyper_param))
         else:
             print("\tQuadratic kernel with: ")
-
-        print("\t\tr: " + str(r) + ", hyper parameter: " + str(hyper_param))
+            print("\t\tr: " + str(r) + ", hyper parameter: " + str(hyper_param))
 
         print("\tContent Matrix: " + str(contentMatrix))
         if contentMatrix:
@@ -91,7 +91,7 @@ class Vectorizer():
             print("\t\t" + metric + " : " + str(performance[metric]))
 
         return performance
-    
+
     """
     runKBestFeatures(): Performs select K best features
     Input:  k: for k best features
@@ -105,7 +105,7 @@ class Vectorizer():
     """
     def runKBestFeatures(self, k, contentMatrix=True, contentMatrixFeatures=[], wordN=1,\
             stylisticMatrix=True, stylisticMatrixFeatures=[],charN=3, testSize=.3):
-        
+
         m = {} # Dictionary to pass information to getSplitData
 
         # If content matrix, build appropriate data
@@ -121,7 +121,7 @@ class Vectorizer():
 
         # Find best k features
         X_new = SelectKBest(chi2, k=k).fit(X_train, Y_train) # Get the best scores
-        
+
         # Create dictionary to search through
         scores = {}         # Add best scores to s
 
@@ -153,7 +153,7 @@ class Vectorizer():
                         features.append("content: " + str(s[1] - cmFS))
 
             smStart = len(ids) + cmFS
-        
+
         if stylisticMatrix:
             ids = self.generateNgramID(charN, True)
             # Get top k features from s
@@ -208,14 +208,14 @@ class Vectorizer():
             print("\t\t" + metric + " : " + str(performance[metric]))
         print("-----------------------------------------")
 
-        return features, performance 
+        return features, performance
 
     """
     runSVC(): Returns performance results from SVC classifier
     for matrices
     Input:  X_train, Y_train, X_test, Y_test: sets of vectors of features and labels
             r, hyper_param, kernel_type, degree: attributes to run svc classifier
-    Output: X_train, Y_train, X_test, Y_test 
+    Output: X_train, Y_train, X_test, Y_test
     """
     def runSVC(self, X_train, Y_train, X_test, Y_test,\
             r=1, hyper_param=0.1, kernel_type=0, degree=1):
@@ -237,13 +237,13 @@ class Vectorizer():
     for matrices
     Input:  matrices: dictionary informing about desired features
             testSize: size of test set compared to entire data set
-    Output: X_train, Y_train, X_test, Y_test 
+    Output: X_train, Y_train, X_test, Y_test
     """
-    
+
     def getSplitData(self, matrices={'content':[1, []], 'stylistic':[3, []]}, testSize=0.3):
         # Get split data from self.data with testSize
         X_train, X_test, Y_train, Y_test = self.data.getRandomSplitData(testSize)
-        
+
         # Declare variable for content train and test matrices
         cmTr, cmTe = None, None
 
@@ -302,7 +302,7 @@ class Vectorizer():
         # Generate n gram ids
         ids = self.generateNgramID(n)
 
-        
+
         cols = len(ids) + len(features) + 1
         if 3 in features:
             cols += 2
@@ -337,7 +337,7 @@ class Vectorizer():
             if 4 in features:
                 fm[i][fCS + 7] = t.getNumTokens()
 
-        return fm, fCS 
+        return fm, fCS
 
     """
     getStylisticMatrix(): Returns the feature matrix for stylistic features

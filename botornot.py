@@ -1,5 +1,6 @@
 from dataparser import Data
 from Vectorizer import Vectorizer
+from topic_model import TopicModel
 
 if __name__ == "__main__":
     print("Running botornot")
@@ -9,7 +10,7 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     v = Vectorizer(electionTweets, electionTrolls)
-    
+
     # Run SVM with default features
     # Features such as content matrix and kernel type
     # can be changed
@@ -27,10 +28,10 @@ if __name__ == "__main__":
     f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
             stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
-    
+
     """
     Uncomment for k best merged matrix
-    
+
     for i in [100, 500, 1000]:
         print("k = " +  str(i))
         f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
@@ -40,4 +41,21 @@ if __name__ == "__main__":
 
         #for feature in f:
             #print(feature)
+    """
+
+    """
+    Uncomment for LDA based classification
+
+    data = Data(electionTweets, electionTrolls)
+
+    x_train, x_test, y_train, y_test = data.getSplitDataDL(.3)
+
+    tc = TopicModel(testing = True, training_data = x_train[:5000] , training_label = y_train[:5000])
+
+    y_pred = []
+
+    for x in x_test:
+        y_pred.append(tc.classify(x))
+
+    print(classification_report(y_test, y_pred))
     """

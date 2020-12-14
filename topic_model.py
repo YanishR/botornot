@@ -3,22 +3,30 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from sklearn.metrics import classification_report
 
 # class to implement topic model using Latent Dirichlet Allocation
 class TopicModel:
     # given an address to a dataset of legit tweets and another to fake tweets, constructs a TopicModel object
-    def __init__(self, data):
-
+    def __init__(self, data = None, testing = False, training_data = None, training_label = None):
         self.legit, self.fake = [], []
 
-        for tweet in data.getRealTweets()[:1000]:
-            self.legit.append(tweet.getText())
+        if testing == False:
+            for tweet in data.getRealTweets():
+                self.legit.append(tweet.getText())
 
-        for tweet in data.getTrollTweets()[:1000]:
-            self.fake.append(tweet.getText())
+            for tweet in data.getTrollTweets():
+                self.fake.append(tweet.getText())
+
+        elif testing:
+            assert(len(training_data) == len(training_label))
+            for i in range(len(training_data)):
+                if training_label[i] == 0:
+                    self.legit.append(training_data[i])
+                else:
+                    self.fake.append(training_data[i])
 
         self.tweets = self.legit + self.fake
-
         self.cv_tweets = CountVectorizer(max_df = 0.95, min_df = 2, stop_words = 'english')
         self.cv_tweets.fit(self.tweets)
         self.df_tweets = self.cv_tweets.transform(self.tweets)
@@ -41,7 +49,7 @@ class TopicModel:
         legit_similarity = cosine_similarity(   topic_vector, max_legit_vec.reshape(1,-1)  )[0][0]
         fake_similarity = cosine_similarity(   topic_vector, max_fake_vec.reshape(1,-1)  )[0][0]
         #
-        return "legit" if legit_similarity > fake_similarity else "fake"
+        return 0 if legit_similarity > fake_similarity else 1  # 0 represents legit, 1 represents fake
 
     # given a string tweet, returns its topic vector form
     def topic_vectorize(self, tweet):
@@ -59,18 +67,13 @@ if __name__ == "__main__":
 
     data = Data(electionTweets, electionTrolls)
 
-    tc = TopicModel(data)
+    x_train, x_test, y_train, y_test = data.getSplitDataDL(.3)
 
-    print(tc.classify("i'm going to vote for hillary clinton, thanks!"))
-    print(tc.topic_vectorize("please vote for donald trump"))
-    # print("LEGITIMATE TWEETS:\n\n")
-    # for index, topic in enumerate(lda_tweets.components_):
-    #     print(f'Top 15 words for Topic #{index}')
-    #     print([cv_tweets.get_feature_names()[i] for i in topic.argsort()[-15:]])
-    #     print('\n')
-    #
-    # print("TROLL TWEETS:\n\n")
-    # for index, topic in enumerate(lda_trolls.components_):
-    #     print(f'Top 15 words for Topic #{index}')
-    #     print([cv_trolls.get_feature_names()[i] for i in topic.argsort()[-15:]])
-    #     print('\n')
+    tc = TopicModel(testing = True, training_data = x_train[:5000] , training_label = y_train[:5000])
+
+    y_pred = []
+
+    for x in x_test:
+        y_pred.append(tc.classify(x))
+
+    print(classification_report(y_test, y_pred))
