@@ -13,7 +13,6 @@ from dataparser import *
 from tweet import *
 
 # hyperparameters
-vocab_size = 5000 # make the top list of words (common words)
 embedding_dim = 32 # embedding dimension
 max_length = 200 # tweet max length 
 trunc_type = 'post' # truncate at the end
@@ -25,17 +24,36 @@ class RNN():
   Input: data  - a list of string (tweets)
          label - a list of binary number indicating categories
   '''
-  def __init__(self, data, label):
-    self.data = data 
-    self.label = label 
+  def __init__(self, electionTweets, electionTrolls, testSpilt=0.3):
+    self.dataset = Data(electionTweets, electionTrolls)
+    self.testSplit = testSpilt
     self.data_tokenizer = None
     self.model = None
     self.vocab_size = 5000
+    self.initialize()
+
+  def initialize(self):
+    x_train, x_test, y_train, y_test = self.dataset.getSplitDataDL(self.testSplit)
+    train_data = [] # for preprocess
+    test_data = []
+    for t in x_train:
+      T = Tweet(t)
+      train_data.append(T.preprocess())
+    for t in x_test:
+      T = Tweet(t)
+      test_data.append(T.preprocess())
+    # print(len(train_data), len(y_train))
+    # print(len(test_data), len(y_test))
+    self.trainData = train_data
+    self.trainLabel = y_train
+    self.testData = test_data
+    self.testLabel = y_test
+    
 
   '''Initialized the training tokenizer'''
   def initializeTokenizer(self):
     tokenizer = Tokenizer(num_words=self.vocab_size, oov_token=oov_tok)
-    tokenizer.fit_on_texts(self.data)
+    tokenizer.fit_on_texts(self.trainData)
     self.data_tokenizer = tokenizer
 
   '''Convert string data to number vectors with padding and truncation
@@ -88,10 +106,10 @@ class RNN():
       return 2*((precision*recall)/(precision+recall+K.epsilon()))
     
     self.initializeTokenizer()
-    train_padded = self.convert2vec(self.data)
-    train_label = np.array(self.label)
+    train_padded = self.convert2vec(self.trainData)
+    train_label = np.array(self.trainLabel)
     model = Sequential()
-    model.add(Embedding(vocab_size, embedding_dim))
+    model.add(Embedding(self.vocab_size, embedding_dim))
     # embedding_matrix = self.embeddingMetrics() # only used for GloVe embeddings
     # model.add(Embedding(self.vocab_size, max_length, weights = [embedding_matrix], 
     # input_length= max_length, trainable = False)) # only used for GloVe embeddings
@@ -109,32 +127,19 @@ class RNN():
          test_label - test set label, a list of binary number indicating categories
   Return: scores - a list of metrics results
   '''
-  def evaluate(self, test_data, test_label):
-    test_padded = self.convert2vec(test_data)
-    test_label_new = np.array(test_label)
+  def evaluate(self):
+    test_padded = self.convert2vec(self.testData)
+    test_label_new = np.array(self.testLabel)
     scores = self.model.evaluate(test_padded, test_label_new, verbose=0)
     # print(scores)
     print("Accuracy: %.2f%%" % (scores[1]*100))
     return scores
 
-if __name__ == "__main__":
-    print("hello world!")
-    electionTweets = "./data/2016_US_election_tweets_100k.csv"
-    electionTrolls = "./data/IRAhandle_tweets_1.csv"
-
-    tweets = Data(electionTweets, electionTrolls)
-    x_train, x_test, y_train, y_test = tweets.getSplitDataDL(.3)
-    train_data = [] # for preprocess
-    test_data = []
-    for t in x_train:
-      T = Tweet(t)
-      train_data.append(T.preprocess())
-    for t in x_test:
-      T = Tweet(t)
-      test_data.append(T.preprocess())
-    # print(len(train_data), len(y_train))
-    # print(len(test_data), len(y_test))
-    myRNN = RNN(train_data, y_train)
-    myRNN.trainLSTM()
-    scores = myRNN.evaluate(test_data, y_test)
+  def run(self):
+    print("Running LSTM experiments")
+    self.trainLSTM()
+    scores = self.evaluate()
     print(scores)
+
+    
+    

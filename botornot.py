@@ -1,5 +1,6 @@
 from dataparser import Data
 from Vectorizer import Vectorizer
+from RNN import RNN
 
 if __name__ == "__main__":
     print("Running botornot")
@@ -9,6 +10,7 @@ if __name__ == "__main__":
     electionTrolls = "./data/IRAhandle_tweets_1.csv"
 
     v = Vectorizer(electionTweets, electionTrolls)
+    myRNN = RNN(electionTweets, electionTrolls)
     
     # Run SVM with default features
     # Features such as content matrix and kernel type
@@ -41,3 +43,7 @@ if __name__ == "__main__":
         #for feature in f:
             #print(feature)
     """
+
+    # Run LSTM experiments
+    # A summary of the Model and Results will be printed
+    myRNN.run()

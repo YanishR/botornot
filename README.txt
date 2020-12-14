@@ -17,7 +17,23 @@ for Deep Learning:
 
 Run:
 --------------------
-for Deep Learning: python3 RNN.py
+for Deep Learning:
+- construct RNN() with real tweet file and troll tweet file.
+- run() with deafult settings.
+
+default parameters:
+- embedding_dim = 32 # embedding dimension
+- max_length = 200 # tweet max length 
+- trunc_type = 'post' # truncate at the end
+- padding_type = 'post' # padding at the end
+- oov_tok = '<OOV>' # OOV = Out of Vocabulary
+- vocab_size = 5000 # top common words
+- epochs = 3
+- batch_size = 16
+- hidden neurons = 32
+- no droup out layer
+
+note: all hyperparameters and architecture can be changed in RNN.py
 --------------------
 
 ----------------------------------------
