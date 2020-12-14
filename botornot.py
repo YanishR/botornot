@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # can be changed
     # See README for more information
     # Results will be printed
-    #v.runSVM()
+    v.runSVM()
 
     # Run K best features with
     # specific features
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # n for word n-gram: ¡
     # stylistic matrix contains all features (1 to 7)
     # n for char n-gram:3
-    #f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
+    f, p = v.runKBestFeatures(1000, contentMatrix=True, contentMatrixFeatures=[i for i in range(5)], wordN=1,\
             #stylisticMatrix=True, stylisticMatrixFeatures = [i for i in range(7)], charN=3, testSize=.3)
 
     
